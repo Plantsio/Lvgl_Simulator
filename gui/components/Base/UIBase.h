@@ -8,7 +8,7 @@
 #include <vector>
 #include <any>
 
-#include "lvgl.h"
+#include "lvgl/lvgl.h"
 #include "gui_config.h"
 #include "event_config.h"
 #include "DeInitializable.h"
