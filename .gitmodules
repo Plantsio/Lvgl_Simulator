@@ -1,0 +1,4 @@
+[submodule "simulator"]
+	path = simulator
+	url = git@github.com:lvgl/lv_port_pc_eclipse.git
+	branch = release/v8.3
