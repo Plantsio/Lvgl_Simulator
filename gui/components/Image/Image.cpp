@@ -1,0 +1,154 @@
+//
+// Created by Huwensong on 2024/11/11.
+//
+
+#include "Image.h"
+#include "fcntl.h"
+#include "esp32-hal-log.h"
+#include "esp_heap_caps.h"
+#include "Animation.h"
+
+namespace UI
+{
+	Image::Image(lv_obj_t *parent) :
+    m_image(lv_img_create(parent))
+	{}
+
+	Image::~Image()
+	{
+		clear();
+		lv_obj_del(m_image);
+	}
+
+	void Image::update(const std::string &name,bool anim_on,uint32_t duration,uint32_t delay)
+	{
+		clear();
+
+		if (!load_image(get_assets_path(name)))
+		{
+			log_e("Failed to load image");
+			return;
+		}
+
+		if (!decode_image())
+		{
+			log_e("Failed to decode image");
+			return;
+		}
+
+		m_img_desc.header.cf = LV_IMG_CF_TRUE_COLOR;
+		m_img_desc.header.h  = m_mjpeg_dec.getHeight();
+		m_img_desc.header.w  = m_mjpeg_dec.getWidth();
+		m_img_desc.data      = (uint8_t *)m_draw_cache;
+
+		lv_img_set_src(m_image, &m_img_desc);
+
+		if (anim_on)
+		{
+			Animation::anim_fade_in(m_image,duration,delay);
+		}
+
+		lv_obj_invalidate(m_image);
+	}
+
+	lv_obj_t *Image::get_image_obj() const
+	{
+		return m_image;
+	}
+
+	bool Image::load_image(const std::string &path)
+	{
+		int32_t ret_size = 0;
+
+		log_d("path = %s",path.c_str());
+
+		int fd = open(path.c_str(),O_RDONLY);
+
+		if (fd < 0)
+		{
+			log_e("Image: Failed to open file");
+			return false;
+		}
+
+		//read size of one frame
+		ret_size = read(fd,&m_frame_size,sizeof(uint32_t));
+
+		if(ret_size < 0 || m_frame_size == 0)
+		{
+			log_e("read frame_size error");
+			return false;
+		}
+
+		m_load_cache = (uint8_t *) heap_caps_malloc(m_frame_size,MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+
+		if (!m_load_cache)
+		{
+			log_e("frame data malloc error");
+			return false;
+		}
+
+		ret_size = read(fd,m_load_cache,m_frame_size);
+
+		if (ret_size != m_frame_size)
+		{
+			log_e("read frame error");
+			free(m_load_cache);
+			return false;
+		}
+
+		log_d("load image success");
+
+		close(fd);
+
+		return true;
+	}
+
+	bool Image::decode_image()
+	{
+		m_mjpeg_dec.openRAM(m_load_cache,(int)m_frame_size, image_draw_wrapper, nullptr, nullptr);/* fixme */
+		m_mjpeg_dec.setMaxOutputSize(5);
+		m_mjpeg_dec.setUserPointer(this);
+		m_frame_width  = m_mjpeg_dec.getWidth();
+		m_frame_height = m_mjpeg_dec.getHeight();
+		m_draw_cache = (uint16_t *) heap_caps_malloc(m_frame_height * m_frame_width * sizeof(uint16_t),MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+		if (!m_draw_cache)
+			return false;
+		m_mjpeg_dec.decode(0,0,0);
+		m_mjpeg_dec.close();
+
+		free(m_load_cache);
+		m_load_cache = nullptr;
+
+		log_d("decode success");
+		return true;
+	}
+
+	int Image::image_draw_wrapper(JPEGDRAW *draw)
+	{
+		static_cast<Image *>(draw->pUser)->image_draw_cb(draw);
+		return true;
+	}
+
+	void Image::image_draw_cb(JPEGDRAW *draw)
+	{
+		for (int i = 0; i < draw->iHeight;i ++)
+		{
+			memcpy((m_draw_cache + m_frame_width * (i + draw->y) + draw->x),(draw->pPixels + draw->iWidth * i),draw->iWidth * sizeof(uint16_t));
+		}
+
+	}
+
+	std::string Image::get_assets_path(const std::string &name)
+	{
+		return std::string("/sd/assets/") + name + ".mjpeg";
+	}
+
+	void Image::clear()
+	{
+		if (m_load_cache)
+			free(m_load_cache);
+		if (m_draw_cache)
+			free(m_draw_cache);
+	}
+}
+
