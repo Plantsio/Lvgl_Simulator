@@ -5,18 +5,11 @@
 #ifndef SIMULATOR_INTERFACE_H
 #define SIMULATOR_INTERFACE_H
 
-#include <stdio.h>
+#include <cstdio>
 
-int log_printf(const char *fmt, ...);
+#define MALLOC_CAP_SPIRAM 0
+#define MALLOC_CAP_8BIT   0
 
-#define LOG_FORMAT(letter, format)
-
-#define log_d(format, ...) log_printf(LOG_FORMAT(D, format), ##__VA_ARGS__)
-
-
-void log_d(const char *format,...);
-{
-    printf(,)
-}
+void *heap_caps_malloc(size_t size, char caps);
 
 #endif //SIMULATOR_INTERFACE_H

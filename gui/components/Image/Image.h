@@ -7,7 +7,7 @@
 
 #include <string>
 
-#include "lvgl/lvgl.h"
+#include "lvgl.h"
 #include "JPEGDEC.h"
 
 namespace UI

@@ -4,8 +4,8 @@
 
 #include "Image.h"
 #include "fcntl.h"
-#include "esp32-hal-log.h"
-#include "esp_heap_caps.h"
+#include "log.h"
+#include "interface.h"
 #include "Animation.h"
 
 namespace UI

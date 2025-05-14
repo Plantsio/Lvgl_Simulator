@@ -6,7 +6,7 @@
 #define UI_SANDBOX_TOOLS_H
 
 #include <functional>
-#include "lvgl/lvgl.h"
+#include "lvgl.h"
 #include "string"
 #include "memory"
 

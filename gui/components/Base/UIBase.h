@@ -10,7 +10,7 @@
 #include <vector>
 #include <any>
 
-#include "lvgl/lvgl.h"
+#include "lvgl.h"
 #include "DeInitializable.h"
 #include "GuiManager.h"
 
