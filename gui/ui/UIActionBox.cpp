@@ -59,7 +59,6 @@ namespace UI {
     }
 
     bool UIActionBox::_initialize() {
-        enable_input(INPUT_SRC_MASK(BtnSrcLeft) | INPUT_SRC_MASK(BtnSrcRight));
         Animation::anim_create(mTouchLeftLabel, Animation::anim_fade_cb, LV_OPA_TRANSP, LV_OPA_COVER, 2000, 0, 2500,
                                1200,LV_ANIM_REPEAT_INFINITE);
 
@@ -93,15 +92,10 @@ namespace UI {
         check();
     }
 
-	void UIActionBox::left_input_cb(InputData data)
-	{
-		mStatus = ACTION_CANCEL;
-	}
-
-	void UIActionBox::right_input_cb(InputData data)
-	{
-        mStatus = ACTION_APPLY;
-	}
+    bool UIActionBox::_handleInput(InputEvtType &&input)
+    {
+        return true;
+    }
 
     void UIActionBox::updateTitle(const std::string &title)
     {

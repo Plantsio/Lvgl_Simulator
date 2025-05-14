@@ -1,19 +1,19 @@
 ////
 //// Created by Huwensong on 2023/8/11.
 ////
-//
-//#include "UILabel.h"
-//
-//#include <fstream>
-//
+
+#include "UILabel.h"
+
+#include <fstream>
+
 //#include "Prop.h"
 //#include "Njson.hpp"
 //#include "SD_MMC.h"
 //#include "oldfilepath.h"
 //#include "fat_interface.h"
-//
-//namespace UI
-//{
+
+namespace UI
+{
 //    std::unordered_map<Lang::ui_text_t,std::vector<std::string>> UILabel::m_custom_content_index_list;
 //
 //    const std::array<std::string,Lang::lang_max> lang_path = {
@@ -189,5 +189,5 @@
 //        else
 //            lv_label_set_text(m_default_label, str.c_str());
 //    }
-//}
-//
+}
+

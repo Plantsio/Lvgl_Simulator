@@ -1,15 +1,16 @@
 ////
 //// Created by Huwensong on 2023/8/11.
 ////
-//
-//#ifndef MI_PLANTS_IVY_UILABEL_H
-//#define MI_PLANTS_IVY_UILABEL_H
-//
+
+#ifndef MI_PLANTS_IVY_UILABEL_H
+#define MI_PLANTS_IVY_UILABEL_H
+
 //#include "lvgl.h"
 //
 //#include <string>
 //
 //#include "ThemeInterface.h"
+//#include "Lang.h"
 //
 //namespace UI
 //{
@@ -67,4 +68,4 @@
 //        std::string font_name;
 //    };
 //}
-//#endif //MI_PLANTS_IVY_UILABEL_H
+#endif //MI_PLANTS_IVY_UILABEL_H

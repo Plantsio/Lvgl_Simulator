@@ -31,9 +31,7 @@ namespace UI {
 
         void routine() override;
 
-        void left_input_cb(InputData data) override;
-
-        void right_input_cb(InputData data) override;
+        bool _handleInput(InputEvtType &&input) override;
 
     private:
         void updateTitle(const std::string &title);
