@@ -4,9 +4,6 @@
 
 #include "Animation.h"
 
-#include <utility>
-#include "esp32-hal-log.h"
-
 namespace UI
 {
 	void Animation::anim_fade_in(lv_obj_t *obj,uint32_t duration,uint32_t delay)

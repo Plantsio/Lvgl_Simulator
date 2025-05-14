@@ -6,8 +6,7 @@
 #include <fstream>
 #include <dirent.h>
 #include <memory>
-#include "esp32-hal-log.h"
-#include "filepath.h"
+#include "log.h"
 
 #define LANGUAGE_FILE_PATH     "/theme/language/language.json"
 #define FONT_FILE_PATH         "/theme/font/"

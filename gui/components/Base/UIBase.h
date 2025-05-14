@@ -5,14 +5,14 @@
 #ifndef PLANTSIO_IVY_BASE_H
 #define PLANTSIO_IVY_BASE_H
 
+/**todo:  将程序移植回工程时不要复制头文件**/
+
 #include <vector>
 #include <any>
 
 #include "lvgl/lvgl.h"
-#include "gui_config.h"
-#include "event_config.h"
 #include "DeInitializable.h"
-#include "GuiObj.h"
+#include "GuiManager.h"
 
 namespace UI {
     class Base : public DeInitializable {
@@ -30,31 +30,11 @@ namespace UI {
 
         virtual bool _handleInput(InputEvtType &&input) { return true; };
 
-        void enable_input(uint32_t input);
-
-        void disable_input(uint32_t input);
-
-        void touch_input_handler(InputSource source, InputData data);
-
         bool load();
 
         void dismiss();
 
-        [[nodiscard]] uint32_t get_input_mask() const;
-
         bool externalClose(Gui::GuiDismissCb &&cb = nullptr);
-
-    protected:
-        /* bound to touch events */
-        virtual void left_input_cb(InputData data) {};
-
-        virtual void right_input_cb(InputData data) {};
-
-        virtual void front_input_cb(InputData data) {};
-
-        virtual void back_input_cb(InputData data) {};
-
-        virtual void plant_input_cb(InputData data) {};
 
     private:
         bool _initialize() override { return true; };

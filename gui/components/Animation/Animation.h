@@ -6,7 +6,7 @@
 #define FIRMWARE_ANIMATION_H
 
 #include <functional>
-#include "lvgl.h"
+#include "lvgl/lvgl.h"
 
 namespace UI
 {

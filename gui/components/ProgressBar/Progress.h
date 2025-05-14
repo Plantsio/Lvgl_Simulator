@@ -6,7 +6,7 @@
 #define PLANTSIO_IVY_UIPROGRESS_H
 
 #include <string>
-#include "lvgl.h"
+#include "lvgl/lvgl.h"
 
 namespace UI
 {

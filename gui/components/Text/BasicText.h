@@ -6,7 +6,7 @@
 #define FIRMWARE_BASICTEXT_H
 
 #include <string>
-#include "lvgl.h"
+#include "lvgl/lvgl.h"
 #include "Animation.h"
 #include "tools.h"
 #include "ThemeInterface.h"

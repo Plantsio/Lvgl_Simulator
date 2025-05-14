@@ -20,31 +20,6 @@ namespace UI {
         }
     }
 
-    void Base::enable_input(uint32_t input) {
-        m_input_mask = input;
-    }
-
-    void Base::disable_input(uint32_t input) {
-        m_input_mask &= ~input;
-    }
-
-    void Base::touch_input_handler(InputSource source, InputData data) {
-        /* fixme */
-        switch (m_input_mask & (1 << source)) {
-            case INPUT_SRC_MASK(BtnSrcLeft):
-                left_input_cb(data);
-                break;
-            case INPUT_SRC_MASK(BtnSrcRight):
-                right_input_cb(data);
-                break;
-            case INPUT_SRC_MASK(BtnSrcFront):
-                front_input_cb(data);
-                break;
-            default:
-                break;
-        }
-    }
-
     bool Base::load() {
         if (initialize()) {
             lv_scr_load(m_scr);
@@ -57,18 +32,15 @@ namespace UI {
         deInitialize();
     }
 
-    uint32_t Base::get_input_mask() const {
-        return m_input_mask;
-    }
 
     bool Base::externalClose(Gui::GuiDismissCb &&cb) {
-        return GuiManager::instance().sendAction(Gui::ActionDismiss{
-                .uid=m_obj->getUID(),
+//        return GuiManager::instance().sendAction(Gui::ActionDismiss{
+//                .uid=m_obj->getUID(),
 //                .cb = cb ? std::move(cb) : []() {
 //                    if (auto sharedPtr = GuiManager::instance().getRouter().lock()) {
 //                        sharedPtr->haltAndResume();
 //                    }
-                .cb = std::move(cb)
-        });
+//                .cb = std::move(cb)
+//        });
     }
 }

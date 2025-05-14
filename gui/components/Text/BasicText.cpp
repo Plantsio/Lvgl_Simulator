@@ -4,7 +4,6 @@
 
 #include "BasicText.h"
 #include "ThemeInterface.h"
-#include "esp32-hal-log.h"
 
 namespace UI
 {
