@@ -5,7 +5,7 @@
 #ifndef FIRMWARE_INDICATOR_H
 #define FIRMWARE_INDICATOR_H
 
-#include "lvgl/lvgl.h"
+#include "lvgl.h"
 
 namespace UI
 {

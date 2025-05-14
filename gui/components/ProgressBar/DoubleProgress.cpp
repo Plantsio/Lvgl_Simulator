@@ -6,7 +6,6 @@
 #include "string"
 #include "tools.h"
 
-#include "Lang.h"
 #include "ThemeInterface.h"
 
 namespace UI

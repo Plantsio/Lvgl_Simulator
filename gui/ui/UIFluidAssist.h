@@ -12,7 +12,7 @@ namespace UI {
 
     class UIFluidAssist : public UIFluid {
     public:
-        UIFluidAssist(ObjPtr obj, int tank_size=WATER_TANK_SIZE);
+        explicit UIFluidAssist(ObjPtr obj, int tank_size=WATER_TANK_SIZE);
 
         void update_status(bool force) override;
 

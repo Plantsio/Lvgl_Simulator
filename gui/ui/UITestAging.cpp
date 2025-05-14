@@ -4,7 +4,6 @@
 
 #include "UITestAging.h"
 #include "tools.h"
-#include "system.h"
 
 namespace UI {
     UITestAging::UITestAging(ObjPtr obj)

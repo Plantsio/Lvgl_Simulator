@@ -5,9 +5,9 @@
 #include "UITomatoClock.h"
 #include "tools.h"
 #include "ThemeInterface.h"
-#include "Prop.h"
-#include "IvyBody.h"
-#include "IvyEngine.h"
+
+#include "Lang.h"
+#include "log.h"
 
 LV_IMG_DECLARE(TomatoFruit)
 LV_IMG_DECLARE(TomatoLeaf)

@@ -8,6 +8,7 @@
 #include "definitions.h"
 #include "SysOld.h"
 #include "ThemeInterface.h"
+#include "Lang.h"
 
 namespace UI
 {

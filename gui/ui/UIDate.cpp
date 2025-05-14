@@ -5,8 +5,6 @@
 #include "UIDate.h"
 #include "vector"
 #include "tools.h"
-#include "system.h"
-
 #include "Lang.h"
 #include "ThemeInterface.h"
 

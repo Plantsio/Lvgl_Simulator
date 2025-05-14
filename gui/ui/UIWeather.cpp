@@ -5,11 +5,9 @@
 #include "UIWeather.h"
 #include "tools.h"
 #include "lv_conf.h"
-#include "IvyNet.h"
-#include "SysOld.h"
 
 #include "ThemeInterface.h"
-#include "SlotManager.h"
+#include "Lang.h"
 
 namespace UI {
     UIWeather::UIWeather(ObjPtr obj) : Base(std::move(obj)),

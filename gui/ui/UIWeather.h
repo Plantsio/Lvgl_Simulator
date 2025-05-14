@@ -6,8 +6,6 @@
 #define UI_SANDBOX_UIWEATHER_H
 
 #include "UIBase.h"
-#include "system.h"
-#include "SlotLabel.h"
 #include "Indicator.h"
 
 namespace UI {

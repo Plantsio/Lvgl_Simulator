@@ -7,7 +7,6 @@
 
 #include <ctime>
 #include "UIBase.h"
-#include "system.h"
 #include "Indicator.h"
 
 namespace UI {

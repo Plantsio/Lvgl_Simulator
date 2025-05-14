@@ -4,9 +4,8 @@
 
 #include "UITime.h"
 #include "tools.h"
-#include "system.h"
-#include "IvyNet.h"
-#include "SysOld.h"
+#include "log.h"
+#include "Lang.h"
 
 #include "ThemeInterface.h"
 

@@ -6,7 +6,6 @@
 #define PLANTSIO_IVY_UI__H
 
 #include "UIBase.h"
-#include "IvyAnim.h"
 #include "tools.h"
 
 #include "Progress.h"
@@ -37,20 +36,20 @@ namespace UI {
 
     std::unordered_map<int, UIBuilder> &get_builders();
 
-    template<typename T>
-    UIBuilder create_ui_builder(Gui::GuiType id) {
-        return [id]() {
-            //std::lock_guard<std::recursive_timed_mutex> _lock(IvyAnim::instance().get_mutex());
-            auto ui = std::make_shared<T>();
-            ui->set_index(id);
-            return ui;
-        };
-    }
-
-    template<typename T>
-    void register_ui(Gui::GuiType id) {
-        get_builders().insert({id, create_ui_builder<T>(id)});
-    }
+//    template<typename T>
+//    UIBuilder create_ui_builder(Gui::GuiType id) {
+//        return [id]() {
+//            //std::lock_guard<std::recursive_timed_mutex> _lock(IvyAnim::instance().get_mutex());
+//            auto ui = std::make_shared<T>();
+//            ui->set_index(id);
+//            return ui;
+//        };
+//    }
+//
+//    template<typename T>
+//    void register_ui(Gui::GuiType id) {
+//        get_builders().insert({id, create_ui_builder<T>(id)});
+//    }
 
     template<typename T>
     std::shared_ptr<T> build_ui(int id) {

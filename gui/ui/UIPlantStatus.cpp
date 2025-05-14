@@ -11,6 +11,7 @@
 #ifndef LV_SIM
 
 #include "SysOld.h"
+#include "Lang.h"
 
 #endif
 
