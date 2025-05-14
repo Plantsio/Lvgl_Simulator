@@ -23,10 +23,10 @@ namespace UI {
         update_sub(sub, anim_on);
         realign();
 
-        auto a = anim_create(m_arc, anim_fade, LV_OPA_TRANSP, LV_OPA_COVER,
-                             500, 0, 1200, 1800,
-                             nullptr, nullptr, LV_ANIM_REPEAT_INFINITE);
-        lv_anim_start(&a);
+//        auto a = anim_create(m_arc, anim_fade, LV_OPA_TRANSP, LV_OPA_COVER,
+//                             500, 0, 1200, 1800,
+//                             nullptr, nullptr, LV_ANIM_REPEAT_INFINITE);
+//        lv_anim_start(&a);
     }
 
     void UIPopUp::update_main(const char *main, bool anim_on) {

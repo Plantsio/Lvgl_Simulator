@@ -3,8 +3,8 @@
 //
 
 #include "UITest.h"
-#include "tools.h"
-
+#include "interface.h"
+#include "log.h"
 #include "ThemeInterface.h"
 
 namespace UI {
@@ -64,14 +64,6 @@ namespace UI {
         lv_obj_set_style_text_color(m_step_label, text_color, 0);
         lv_obj_set_style_text_color(m_value_label, text_color, 0);
         lv_obj_set_style_text_color(m_desc_label, text_color, 0);
-    }
-
-    void UITest::left_input_cb(InputData data) {
-        left_touched = true;
-    }
-
-    void UITest::right_input_cb(InputData data) {
-        right_touched = true;
     }
 
     void UITest::update(int progress, const char *step, const char *desc, lv_color_t color) {

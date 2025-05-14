@@ -6,6 +6,7 @@
 #define LVGL_UITIME_H
 
 #include <ctime>
+#include <string>
 #include "UIBase.h"
 #include "Indicator.h"
 

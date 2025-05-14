@@ -4,7 +4,6 @@
 
 #include "UIDate.h"
 #include "vector"
-#include "tools.h"
 #include "Lang.h"
 #include "ThemeInterface.h"
 
@@ -89,15 +88,15 @@ namespace UI {
     bool UIDate::_initialize() {
         timer = lv_timer_create(anim_calender, 20, lv_calendar_get_btnmatrix(calendar));
         lv_timer_pause(timer);
-        lv_anim_t a1 = anim_create(init_label, anim_fade, LV_OPA_TRANSP, LV_OPA_COVER, 1000, 100, 1000, 1500, nullptr,
-                                   this);
-        lv_anim_t a2 = anim_create(init_label, anim_move_ver, lv_obj_get_y(init_label) + 40, lv_obj_get_y(init_label),
-                                   1000,
-                                   100, 0, 0, label_hide_cb_wrap, this);
-        lv_anim_t a3 = anim_create(line, anim_fade, LV_OPA_TRANSP, LV_OPA_COVER, 1000, 100);
-        lv_anim_start(&a1);
-        lv_anim_start(&a2);
-        lv_anim_start(&a3);
+//        lv_anim_t a1 = anim_create(init_label, anim_fade, LV_OPA_TRANSP, LV_OPA_COVER, 1000, 100, 1000, 1500, nullptr,
+//                                   this);
+//        lv_anim_t a2 = anim_create(init_label, anim_move_ver, lv_obj_get_y(init_label) + 40, lv_obj_get_y(init_label),
+//                                   1000,
+//                                   100, 0, 0, label_hide_cb_wrap, this);
+//        lv_anim_t a3 = anim_create(line, anim_fade, LV_OPA_TRANSP, LV_OPA_COVER, 1000, 100);
+//        lv_anim_start(&a1);
+//        lv_anim_start(&a2);
+//        lv_anim_start(&a3);
         return true;
     }
 
@@ -109,14 +108,14 @@ namespace UI {
     }
 
     void UIDate::label_hide_cb() {
-        auto a1 = anim_create(init_label, anim_move_ver, lv_obj_get_y(init_label), lv_obj_get_y(init_label) - 40, 500,
-                              1500, 0, 0, nullptr, this);
-        auto a2 = anim_create(line, anim_move_ver, lv_obj_get_y(line), 50, 1000,
-                              1500);
-        auto a3 = anim_create(line, anim_line_width, 260, 200, 1000, 1500, 0, 0, line_end_cb, this);
-        lv_anim_start(&a1);
-        lv_anim_start(&a2);
-        lv_anim_start(&a3);
+//        auto a1 = anim_create(init_label, anim_move_ver, lv_obj_get_y(init_label), lv_obj_get_y(init_label) - 40, 500,
+//                              1500, 0, 0, nullptr, this);
+//        auto a2 = anim_create(line, anim_move_ver, lv_obj_get_y(line), 50, 1000,
+//                              1500);
+//        auto a3 = anim_create(line, anim_line_width, 260, 200, 1000, 1500, 0, 0, line_end_cb, this);
+//        lv_anim_start(&a1);
+//        lv_anim_start(&a2);
+//        lv_anim_start(&a3);
     }
 
     void UIDate::calendar_show_cb() {
@@ -127,8 +126,8 @@ namespace UI {
         btn_index = 0;
         lv_timer_resume(timer);
 //    auto a = anim_create(lv_calendar_get_btnmatrix(calendar), anim_calender, 0, 48, 500);
-        auto a = anim_create(lv_calendar_get_btnmatrix(calendar), anim_fade, LV_OPA_TRANSP, LV_OPA_COVER, 400);
-        lv_anim_start(&a);
+//        auto a = anim_create(lv_calendar_get_btnmatrix(calendar), anim_fade, LV_OPA_TRANSP, LV_OPA_COVER, 400);
+//        lv_anim_start(&a);
 //    auto a = anim_create(calendar, anim_fade, LV_OPA_TRANSP, LV_OPA_COVER, 500);
 //    lv_anim_start(&a);
     }

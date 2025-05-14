@@ -37,9 +37,9 @@ namespace UI
 
 			if (anim_on)
 			{
-				Animation::anim_create(m_base_label, anim_fade,LV_OPA_COVER, LV_OPA_TRANSP,
-									   m_fade_out_t, delay,0, 0, 0,
-									   fade_in,this);
+//				Animation::anim_create(m_base_label, anim_fade,LV_OPA_COVER, LV_OPA_TRANSP,
+//									   m_fade_out_t, delay,0, 0, 0,
+//									   fade_in,this);
 			}
 			else
 			{
@@ -61,7 +61,7 @@ namespace UI
 	void BasicText::update()
 	{
 		lv_label_set_text(m_base_label,m_content.c_str());
-		Animation::anim_create(m_base_label, anim_fade,LV_OPA_TRANSP, LV_OPA_COVER,
-							   m_fade_out_t);
+//		Animation::anim_create(m_base_label, anim_fade,LV_OPA_TRANSP, LV_OPA_COVER,
+//							   m_fade_out_t);
 	}
 }

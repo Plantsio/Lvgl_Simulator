@@ -15,9 +15,8 @@ namespace UI {
 
         void update_info();
 
-		void left_input_cb(InputData data) override;
-
-		void right_input_cb(InputData data) override;
+    private:
+        bool _handleInput(InputEvtType &&input) override;
 
     private:
         lv_obj_t *m_table;

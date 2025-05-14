@@ -20,4 +20,4 @@ file(GLOB_RECURSE GUI_SOURCES
         ${GUI_PATH}/components/*.cpp
         ${GUI_PATH}/theme/*.cpp
         ${GUI_PATH}/ui/*.cpp
-        ${GUI_PATH}/embedded/*.cpp)
+        ${GUI_PATH}/embedded/*.*)

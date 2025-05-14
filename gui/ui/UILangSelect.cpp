@@ -4,11 +4,7 @@
 
 #include "UILangSelect.h"
 #include "Lang.h"
-#include "Prop.h"
-#include "Skin.h"
-#include "Boot.h"
-#include "oldfilepath.h"
-#include "SD_MMC.h"
+
 
 #define PRESSING_PERIOD 3000
 
@@ -48,25 +44,10 @@ namespace UI
 //        }
     }
 
-	void UILangSelect::left_input_cb(InputData data)
-	{
-		int index_min = 0;
-		if (m_lang_index > index_min)
-			m_lang_index --;
-		else
-			m_lang_index = index_min;
-	}
-
-	void UILangSelect::right_input_cb(InputData data)
-	{
-		int index_max = Lang::lang_max - 1;
-		if (m_lang_index < index_max)
-			m_lang_index ++;
-		else
-			m_lang_index = index_max;
-	}
-
-
+    bool UILangSelect::_handleInput(InputEvtType &&input)
+    {
+        return true;
+    }
 
     void UILangSelect::set_roller_style()
     {
@@ -113,19 +94,6 @@ namespace UI
 
     }
 
-    void UILangSelect::front_input_cb(InputData data)
-    {
-
-		Prop::set(Prop::language, m_lang_index, false, false, true);
-
-		bool stored = store_factory();
-
-		if (stored)
-		{
-			vTaskDelay(1000);
-			Boot::soft_reboot();
-		}
-    }
 
     void UILangSelect::update()
     {
@@ -137,18 +105,18 @@ namespace UI
 
     bool UILangSelect::store_factory()
     {
-        std::string name = "/Language";
-        std::string path = PATH_FACTORY_LOCAL + name;
-
-        File file = SD_MMC.open(path.c_str(),FILE_WRITE);
-
-        if (file.available())
-        {
-            file.write((uint8_t *)&m_lang_index, sizeof(int));
-
-            file.close();
-            return true;
-        }
+//        std::string name = "/Language";
+//        std::string path = PATH_FACTORY_LOCAL + name;
+//
+//        File file = SD_MMC.open(path.c_str(),FILE_WRITE);
+//
+//        if (file.available())
+//        {
+//            file.write((uint8_t *)&m_lang_index, sizeof(int));
+//
+//            file.close();
+//            return true;
+//        }
 
         return false;
     }

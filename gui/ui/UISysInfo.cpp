@@ -3,10 +3,10 @@
 //
 
 #include "UISysInfo.h"
-#include "WiFi.h"
-#include "IvyNet.h"
-#include "definitions.h"
-#include "SysOld.h"
+//#include "WiFi.h"
+//#include "IvyNet.h"
+//#include "definitions.h"
+//#include "SysOld.h"
 #include "ThemeInterface.h"
 #include "Lang.h"
 
@@ -71,35 +71,24 @@ namespace UI
 								THEME_TEXT_CONTENT(Lang::ui_sysinfo_evolve).c_str());
 
 
-        lv_table_set_cell_value(m_table, 0, 1, WiFi.SSID().c_str());
-        lv_table_set_cell_value(m_table, 3, 1, SysOld::get_geo_info().location.city_district.c_str());
-
-        lv_table_set_cell_value(m_table, 1, 1, SysOld::get_geo_info().public_ip.c_str());
-        lv_table_set_cell_value(m_table, 2, 1, WiFi.localIP().toString().c_str());
-        lv_table_set_cell_value(m_table, 4, 1, SOFTWARE_VER);
-
-        lv_obj_center(m_table);
-        time_t t = Prop::get<uint32_t>(Prop::last_evolve_time);
-        tm *info = localtime(&t);
-        std::string t_str = std::to_string(info->tm_year + 1900) + "-" + std::to_string(info->tm_mon + 1) + "-" +
-                            std::to_string(info->tm_mday);
-        lv_table_set_cell_value(m_table, 5, 1, t_str.c_str());
+//        lv_table_set_cell_value(m_table, 0, 1, WiFi.SSID().c_str());
+//        lv_table_set_cell_value(m_table, 3, 1, SysOld::get_geo_info().location.city_district.c_str());
+//
+//        lv_table_set_cell_value(m_table, 1, 1, SysOld::get_geo_info().public_ip.c_str());
+//        lv_table_set_cell_value(m_table, 2, 1, WiFi.localIP().toString().c_str());
+//        lv_table_set_cell_value(m_table, 4, 1, SOFTWARE_VER);
+//
+//        lv_obj_center(m_table);
+//        time_t t = Prop::get<uint32_t>(Prop::last_evolve_time);
+//        tm *info = localtime(&t);
+//        std::string t_str = std::to_string(info->tm_year + 1900) + "-" + std::to_string(info->tm_mon + 1) + "-" +
+//                            std::to_string(info->tm_mday);
+//        lv_table_set_cell_value(m_table, 5, 1, t_str.c_str());
 
     }
 
-	void UISysInfo::left_input_cb(InputData data)
-	{
-			
-	}
-
-	void UISysInfo::right_input_cb(InputData data)
-	{
-		static lv_coord_t current_p = 0;
-		if (current_p > lv_obj_get_height(m_table)) {
-			current_p = 0;
-		} else {
-			current_p += SYS_UI_HEIGHT;
-		}
-		lv_obj_scroll_to_y(m_table, current_p, LV_ANIM_ON);
-	}
+    bool UISysInfo::_handleInput(InputEvtType &&input)
+    {
+        return true;
+    }
 }

@@ -3,7 +3,8 @@
 //
 
 #include "UITestError.h"
-#include "tools.h"
+#include "interface.h"
+#include <string>
 
 namespace UI {
     static void draw_cb(lv_event_t *e) {

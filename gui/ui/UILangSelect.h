@@ -20,18 +20,14 @@ namespace UI
     public:
         void routine() override;
 
-        void left_input_cb(InputData data) override;
-
-		void right_input_cb(InputData data) override;
-
     private:
         bool _initialize() override;
+
+        bool _handleInput(InputEvtType &&input) override;
 
         void set_roller_style();
 
         void set_text_style();
-
-        void front_input_cb(InputData data) override;
 
         void update();
 

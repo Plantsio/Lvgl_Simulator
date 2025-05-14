@@ -19,10 +19,10 @@ namespace UI
 	public:
 		void routine() override;
 
-		void right_input_cb(InputData data) override;
-
     private:
         bool _initialize() override;
+
+        bool _handleInput(InputEvtType &&input) override;
 
 	private:
 		BasicText m_top_text;

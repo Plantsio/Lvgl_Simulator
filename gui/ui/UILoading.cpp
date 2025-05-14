@@ -3,7 +3,6 @@
 //
 
 #include "UILoading.h"
-#include "tools.h"
 #include "ThemeInterface.h"
 
 namespace UI

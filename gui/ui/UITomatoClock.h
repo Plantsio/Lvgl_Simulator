@@ -33,9 +33,7 @@ namespace UI
         void routine() override;
 
         /* bound to touch events */
-		void left_input_cb(InputData data) override;
-
-		void right_input_cb(InputData data) override;
+		bool _handleInput(InputEvtType &&input) override;
 
         static void set_sync_time(int time);
 
@@ -104,9 +102,7 @@ namespace UI
         explicit UITomatoStatistics(ObjPtr obj);
 
     public:
-		void left_input_cb(InputData data) override;
-
-		void right_input_cb(InputData data) override;
+		bool _handleInput(InputEvtType &&input) override;
 
     private:
         void update_text();

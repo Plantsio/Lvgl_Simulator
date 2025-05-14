@@ -3,18 +3,12 @@
 //
 
 #include "UIBoot.h"
-#include "WiFi.h"
-#include "tools.h"
-#include "SysOld.h"
-#include "IvyAnim.h"
-#include "Sense.h"
-#include "Skin.h"
-#include "Boot.h"
 
 #include <utility>
 #include "Lang.h"
-#include "IvyBody.h"
 #include "ThemeInterface.h"
+#include "log.h"
+#include "SysTime.h"
 
 namespace UI
 {
@@ -52,11 +46,11 @@ namespace UI
 
     bool UIBoot::_initialize()
     {
-        mProcess.update_title(THEME_TEXT_CONTENT(Lang::ui_boot_waking_up).c_str());
+        mProcess.update_title(THEME_TEXT_CONTENT(Lang::ui_boot_waking_up));
         m_timer = lv_timer_create(timer_cb, 100, this);
         lv_timer_ready(m_timer);
 
-        IvyBody::instance().unregister_button_tap();
+        //IvyBody::instance().unregister_button_tap();
         return true;
     }
 
@@ -88,17 +82,17 @@ namespace UI
         if (check_cb())
         {
             update_now(success_desc, progress);
-            log_v("debug-boot %s", success_desc);
+            log_v("debug-boot %s", success_desc.c_str());
             lv_timer_set_period(m_timer, 500);
             return true;
         }
         else
         {
-            if (millis() - m_current_start_t > timeout)
+            if (SysTime::millis() - m_current_start_t > timeout)
             {
                 update_now(Theme::getPaletteText(fail_desc, Theme::palette_warning), progress);
                 over_time = true;
-                log_v("debug-boot %s", fail_desc);
+                log_v("debug-boot %s", fail_desc.c_str());
                 lv_timer_set_period(m_timer, 800);
                 return false;
             }
@@ -108,7 +102,7 @@ namespace UI
 
     void UIBoot::refresh_timeout()
     {
-        m_current_start_t = millis();
+        m_current_start_t = SysTime::millis();
         lv_timer_set_period(m_timer, 100);
     }
 
@@ -141,7 +135,7 @@ namespace UI
                 refresh_timeout();
                 break;
             case 3:
-                if (!check_routine([]() { return SysOld::check_condition(SysOld::IOT_ACTIVATED); }, 20, 10000,
+                if (!check_routine([]() { return true; }, 20, 10000,
                                    THEME_TEXT_CONTENT(Lang::ui_boot_activated),
                                    THEME_TEXT_CONTENT(Lang::ui_boot_activate_fail)))
                 {
@@ -158,7 +152,7 @@ namespace UI
                 refresh_timeout();
                 break;
             case 5:
-                if (!check_routine([]() { return SysOld::check_condition(SysOld::TIMESTAMP_ACQUIRED); }, 30, 5000,
+                if (!check_routine([]() { return true; }, 30, 5000,
                                    THEME_TEXT_CONTENT(Lang::ui_boot_tune_succ),
                                    THEME_TEXT_CONTENT(Lang::ui_boot_tune_fail)))
                 {
@@ -175,7 +169,7 @@ namespace UI
                 refresh_timeout();
                 break;
             case 7:
-                if (!check_routine([]() { return SysOld::check_condition(SysOld::TIME_SYNCHRONIZED); }, 40, 10000,
+                if (!check_routine([]() { return true; }, 40, 10000,
                                    THEME_TEXT_CONTENT(Lang::ui_boot_locate_succ),
                                    THEME_TEXT_CONTENT(Lang::ui_boot_locate_fail)))
                 {
@@ -192,7 +186,7 @@ namespace UI
                 refresh_timeout();
                 break;
             case 9:
-                if (!check_routine([]() { return SysOld::check_condition(SysOld::BODY_INIT_OVER); },
+                if (!check_routine([]() { return true; },
                                    50, 5000,
                                    THEME_TEXT_CONTENT(Lang::ui_boot_physical_succ),
                                    THEME_TEXT_CONTENT(Lang::ui_boot_physical_fail)))
@@ -206,36 +200,38 @@ namespace UI
                 }
                 break;
             case 10:
-                if (Prop::get<bool>(Prop::plant_auto_detect))
-                {
-                    m_plant_detect_cnt = Sense::instance().get_plant_detect_cnt();
-                    Sense::instance().set_plant_force_detect_t(millis());
-                }
-                update_now(THEME_TEXT_CONTENT(Lang::ui_boot_plant_check), 55);
-                refresh_timeout();
+//                if (Prop::get<bool>(Prop::plant_auto_detect))
+//                {
+//                    m_plant_detect_cnt = Sense::instance().get_plant_detect_cnt();
+//                    Sense::instance().set_plant_force_detect_t(millis());
+//                }
+//                update_now(THEME_TEXT_CONTENT(Lang::ui_boot_plant_check), 55);
+//                refresh_timeout();
+                log_d("case 10");
                 break;
             case 11:
-                if (Prop::get<bool>(Prop::plant_auto_detect))
-                {
-                    if (!check_routine(
-                            [this]() { return Sense::instance().get_plant_detect_cnt() != m_plant_detect_cnt; },
-                            60, 10000,
-                            THEME_TEXT_CONTENT(Lang::ui_boot_plant_checked),
-                            THEME_TEXT_CONTENT(Lang::ui_boot_plant_fail)))
-                    {
-                        if (over_time)
-                        {
-                            m_current_step = 12;
-                            over_time = false;
-                        }
-                        return;
-                    }
-                }
+//                if (Prop::get<bool>(Prop::plant_auto_detect))
+//                {
+//                    if (!check_routine(
+//                            [this]() { return true; },
+//                            60, 10000,
+//                            THEME_TEXT_CONTENT(Lang::ui_boot_plant_checked),
+//                            THEME_TEXT_CONTENT(Lang::ui_boot_plant_fail)))
+//                    {
+//                        if (over_time)
+//                        {
+//                            m_current_step = 12;
+//                            over_time = false;
+//                        }
+//                        return;
+//                    }
+//                }
+                log_d("case 11");
                 break;
             case 12:
                 lv_timer_set_period(m_timer, 500);
                 update_now(THEME_TEXT_CONTENT(Lang::ui_boot_calibrating), 80);
-                Skin::instance().get_tp_by_index(Skin::TP_INDEX_FRONT).set_disable_t(10);
+                //Skin::instance().get_tp_by_index(Skin::TP_INDEX_FRONT).set_disable_t(10);
                 break;
             case 13:
                 update_now(THEME_TEXT_CONTENT(Lang::ui_boot_waked_up), 100);
@@ -245,11 +241,11 @@ namespace UI
                 log_d("ui boot complete");
 
                 /* ensure releasing of gpio holding after wake up (for auto wake up) */
-                gpio_hold_dis((gpio_num_t) SCR_BCK_GPIO);
-
-                Boot::booted_cb();
-                SysOld::set_condition(SysOld::BOOT_OVER);
-                IvyBody::instance().register_button_tap();
+//                gpio_hold_dis((gpio_num_t) SCR_BCK_GPIO);
+//
+//                Boot::booted_cb();
+//                SysOld::set_condition(SysOld::BOOT_OVER);
+//                IvyBody::instance().register_button_tap();
                 log_d("ui boot over test");
                 break;
         }

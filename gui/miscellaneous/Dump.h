@@ -9,8 +9,8 @@
 #include <utility>
 #include <iostream>
 #include <fstream>
-#include "tools/path.h"
-#include "sys_config.h"
+#include "log.h"
+//#include "sys_config.h"
 
 /** note: should only be used for temp storage if data type can change.
  * @tparam T data type struct
@@ -46,55 +46,55 @@ public:
     }
 
     bool load(bool autoCreate = true) {
-        auto fileSize = getFileSize(m_path);
-
-        if (fileSize == -1) {
-            log_d("File %s not found", m_path.c_str());
-            if (autoCreate) {
-                return save();
-            }
-            return false;
-        }
-
-        // Handle both non-std::string and std::string types
-        if constexpr (std::is_same<T, std::string>::value) {
-            // For std::string, we first read the length and then the content
-            size_t length;
-            std::ifstream inFile(m_path, std::ios::binary);
-            if (inFile.is_open()) {
-                inFile.read(reinterpret_cast<char *>(&length), sizeof(length)); // Read string length
-                m_cache.resize(length); // Resize the string to fit the content
-                inFile.read(&m_cache[0], length); // Read the string content
-                log_d("Dump %s successfully loaded", m_path.c_str());
-                inFile.close();
-                return true;
-            } else {
-                // create a new one
-                if (autoCreate) {
-                    return save();
-                }
-                return false;
-            }
-        } else {
-            // For non-std::string types, we check the file size to match the expected data size
-            if (fileSize != sizeof(T)) {
-                log_w("Dump %s wrong size %d | %d", m_path.c_str(), sizeof(T), (int) fileSize);
-                return false;
-            }
-            std::ifstream inFile(m_path, std::ios::binary);
-            if (inFile.is_open()) {
-                inFile.read(reinterpret_cast<char *>(&m_cache), sizeof(T));
-                log_d("Dump %s successfully loaded", m_path.c_str());
-                inFile.close();
-                return true;
-            } else {
-                // create a new one
-                if (autoCreate) {
-                    return save();
-                }
-                return false;
-            }
-        }
+//        auto fileSize = getFileSize(m_path);
+//
+//        if (fileSize == -1) {
+//            log_d("File %s not found", m_path.c_str());
+//            if (autoCreate) {
+//                return save();
+//            }
+//            return false;
+//        }
+//
+//        // Handle both non-std::string and std::string types
+//        if constexpr (std::is_same<T, std::string>::value) {
+//            // For std::string, we first read the length and then the content
+//            size_t length;
+//            std::ifstream inFile(m_path, std::ios::binary);
+//            if (inFile.is_open()) {
+//                inFile.read(reinterpret_cast<char *>(&length), sizeof(length)); // Read string length
+//                m_cache.resize(length); // Resize the string to fit the content
+//                inFile.read(&m_cache[0], length); // Read the string content
+//                log_d("Dump %s successfully loaded", m_path.c_str());
+//                inFile.close();
+//                return true;
+//            } else {
+//                // create a new one
+//                if (autoCreate) {
+//                    return save();
+//                }
+//                return false;
+//            }
+//        } else {
+//            // For non-std::string types, we check the file size to match the expected data size
+//            if (fileSize != sizeof(T)) {
+//                log_w("Dump %s wrong size %d | %d", m_path.c_str(), sizeof(T), (int) fileSize);
+//                return false;
+//            }
+//            std::ifstream inFile(m_path, std::ios::binary);
+//            if (inFile.is_open()) {
+//                inFile.read(reinterpret_cast<char *>(&m_cache), sizeof(T));
+//                log_d("Dump %s successfully loaded", m_path.c_str());
+//                inFile.close();
+//                return true;
+//            } else {
+//                // create a new one
+//                if (autoCreate) {
+//                    return save();
+//                }
+//                return false;
+//            }
+//        }
     }
 
     bool remove() {

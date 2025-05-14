@@ -18,11 +18,32 @@ namespace Gui
     using GuiDismissCb = std::function<void()>;
 }
 
-enum InputEvtType
+enum InputEvent
 {
     INPUT_LEFT,
     INPUT_RIGHT,
     INPUT_FRONT,
+};
+
+enum InputType {
+    ButtonPress,
+    ButtonRelease,
+    ButtonClick,
+    ButtonClickSure,
+    ButtonLongPress,
+    ButtonLongHolding,
+    ButtonMultiple,
+};
+
+struct InputData{
+    InputType inputType;
+    uint8_t n;
+};
+
+struct InputEvtType
+{
+    InputEvent index;
+    InputData  data;
 };
 
 class GuiManager

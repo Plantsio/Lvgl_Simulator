@@ -7,7 +7,6 @@
 
 #include "UIBase.h"
 #include "cmath"
-#include "tools.h"
 #include "BasicText.h"
 
 #define WATER_TANK_SIZE                 200

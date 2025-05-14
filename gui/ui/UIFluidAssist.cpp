@@ -3,8 +3,7 @@
 //
 
 #include "UIFluidAssist.h"
-#include "tools.h"
-#include "Plant.h"
+#include "interface.h"
 
 #include "ThemeInterface.h"
 #include "Lang.h"
@@ -36,18 +35,18 @@ namespace UI {
 
     bool UIFluidAssist::_initialize() {
         update_assist_bar();
-        std::string temp = THEME_FORMAT_TEXT<int>(Lang::ui_fluid_add_about, {Plant::get_target_water_volume()});
+        std::string temp = THEME_FORMAT_TEXT<int>(Lang::ui_fluid_add_about, {50});
 
         m_top_text.update(temp);
         return true;
     }
 
     uint16_t UIFluidAssist::get_target_level() {
-        return Plant::get_target_water_volume();
+        return 20;
     }
 
     uint16_t UIFluidAssist::get_target_range() {
-        return Plant::get_target_water_range();
+        return 80;
     }
 
     void UIFluidAssist::update_assist_bar() {

@@ -6,7 +6,7 @@
 #include <iostream>
 #include <streambuf>
 #include <memory>
-#include "esp_heap_caps.h"
+#include "interface.h"
 
 template <typename T>
 class CustomAllocator {

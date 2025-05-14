@@ -28,13 +28,13 @@ namespace UI
         return true;
 	}
 
+    bool UIPlantSelect::_handleInput(InputEvtType &&input)
+    {
+        return true;
+    }
+
 	void UIPlantSelect::routine()
 	{
 		//todo: 检测到植物或者检测到右触结束UIPlantSelect
-	}
-
-	void UIPlantSelect::right_input_cb(InputData data)
-	{
-		m_right_touched = true;
 	}
 }

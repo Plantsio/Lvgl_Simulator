@@ -26,14 +26,8 @@ namespace UI {
 
         void reset_progress();
 
-		void left_input_cb(InputData data) override;
-
-		void right_input_cb(InputData data) override;
 
         void update(int progress, const char *step, const char* desc, lv_color_t color);
-
-        bool right_touched = false;
-        bool left_touched = false;
 
     private:
         lv_obj_t *m_step_label;

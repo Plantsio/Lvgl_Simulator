@@ -12,10 +12,10 @@
 #include <unistd.h>
 #define SDL_MAIN_HANDLED /*To fix SDL's "undefined reference to WinMain" issue*/
 #include <SDL2/SDL.h>
-#include "lvgl/lvgl.h"
-#include "lvgl/examples/lv_examples.h"
-#include "lvgl/demos/lv_demos.h"
-#include "lv_drivers/sdl/sdl.h"
+#include "lvgl.h"
+#include "examples/lv_examples.h"
+#include "demos/lv_demos.h"
+#include "sdl/sdl.h"
 
 /*********************
  *      DEFINES

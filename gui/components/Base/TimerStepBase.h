@@ -59,7 +59,7 @@ namespace UI
 	protected:
         lv_obj_t *mParent;
 
-        std::unique_ptr<BasicText> mTopText = nullptr;
+        BasicText mTopText;
         BasicText mMainText;
         BasicText mSubText;
 		BasicText mBottomText;

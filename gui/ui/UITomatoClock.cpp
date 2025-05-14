@@ -3,16 +3,16 @@
 //
 
 #include "UITomatoClock.h"
-#include "tools.h"
+//#include "tools.h"
 #include "ThemeInterface.h"
 
 #include "Lang.h"
 #include "log.h"
 
-LV_IMG_DECLARE(TomatoFruit)
-LV_IMG_DECLARE(TomatoLeaf)
-LV_IMG_DECLARE(TomatoTotal)
-LV_IMG_DECLARE(TomatoSum)
+//LV_IMG_DECLARE(TomatoFruit)
+//LV_IMG_DECLARE(TomatoLeaf)
+//LV_IMG_DECLARE(TomatoTotal)
+//LV_IMG_DECLARE(TomatoSum)
 
 #define TIME_BASE      60
 
@@ -39,10 +39,10 @@ namespace UI
     m_top_text(m_scr),
     m_bottom_text(m_scr)
     {
-        lv_img_set_src(m_img_tomato_fruit,&TomatoFruit);
+//        lv_img_set_src(m_img_tomato_fruit,&TomatoFruit);
         lv_obj_align(m_img_tomato_fruit, LV_ALIGN_CENTER, 0, 0);
 
-        lv_img_set_src(m_img_tomato_leaf,&TomatoLeaf);
+//        lv_img_set_src(m_img_tomato_leaf,&TomatoLeaf);
         lv_obj_align_to(m_img_tomato_leaf,m_img_tomato_fruit,LV_ALIGN_TOP_RIGHT,-19,-8);
 
 
@@ -78,29 +78,10 @@ namespace UI
         update_text();
     }
 
-	void UITomatoClock::left_input_cb(InputData data)
-	{
-		if (m_tomato_status == tomato_status_init || m_tomato_status == tomato_status_stop)
-			//UIManager::instance().load(UI_TOMATO_Statistics);
-
-			//开始休息时钟
-			if (m_tomato_status == tomato_status_ripen)
-				start_rest_clock();
-	}
-
-	void UITomatoClock::right_input_cb(InputData data)
-	{
-		if (m_tomato_status == tomato_status_init || m_tomato_status == tomato_status_stop )
-		{
-			clock_start();
-		}
-
-		else if (m_tomato_status ==  tomato_status_start || m_tomato_status == tomato_status_rest ||
-				 m_tomato_status == tomato_status_ripen)
-		{
-			clock_stop();
-		}
-	}
+    bool UITomatoClock::_handleInput(InputEvtType &&input)
+    {
+        return true;
+    }
 
 
     int UITomatoClock::last_start_sync_time = 0;
@@ -176,9 +157,9 @@ namespace UI
             {
                 m_tomato_status = tomato_status_ripen;
                 m_tomato_ripen_num ++;
-                Prop::set(Prop::tomato_today,m_tomato_ripen_num, false, false, true);
-                m_tomato_ripen_total ++;
-                Prop::set<int>(Prop::pomodoro,m_tomato_ripen_total, false, true, true);
+//                Prop::set(Prop::tomato_today,m_tomato_ripen_num, false, false, true);
+//                m_tomato_ripen_total ++;
+//                Prop::set<int>(Prop::pomodoro,m_tomato_ripen_total, false, true, true);
                mIndicator.enable_visible(Indicator::ALL);
                 set_clock_time(REST_PERIOD_MINUTES * TIME_BASE + REST_PERIOD_SECONDS);
             }
@@ -270,9 +251,9 @@ namespace UI
 
         //switch_enable = false;
 
-        SysOld::unset_condition(SysOld::SLEEP_ENABLE);
-
-        IvyBody::instance().unregister_button_tap(BUTTON_DELAY_TAP);
+//        SysOld::unset_condition(SysOld::SLEEP_ENABLE);
+//
+//        IvyBody::instance().unregister_button_tap(BUTTON_DELAY_TAP);
 
         set_clock_time(CLOCK_MINUTES * TIME_BASE + CLOCK_SECONDS);
 
@@ -302,11 +283,11 @@ namespace UI
 
        // switch_enable = true;
 
-        IvyEngine::instance().refresh_last_active_t();
-
-        SysOld::set_condition(SysOld::SLEEP_ENABLE);
-
-        IvyBody::instance().register_button_tap(BUTTON_DELAY_TAP);
+//        IvyEngine::instance().refresh_last_active_t();
+//
+//        SysOld::set_condition(SysOld::SLEEP_ENABLE);
+//
+//        IvyBody::instance().register_button_tap(BUTTON_DELAY_TAP);
     }
 
     void UITomatoClock::start_rest_clock()
@@ -324,8 +305,8 @@ namespace UI
 
         //switch_enable = true;
 
-        IvyEngine::instance().refresh_last_active_t();
-        SysOld::set_condition(SysOld::SLEEP_ENABLE);
+//        IvyEngine::instance().refresh_last_active_t();
+//        SysOld::set_condition(SysOld::SLEEP_ENABLE);
 
         set_clock_time(CLOCK_MINUTES * TIME_BASE + CLOCK_SECONDS);
         lv_obj_set_style_img_recolor(m_img_tomato_fruit, m_color_list.at(0), 0);
@@ -341,21 +322,21 @@ namespace UI
     {
         int start_time,cur_time;
 
-        cur_time = get_ymd(get_epoch());
-
-        start_time = Prop::get<int>(Prop::start_sync_time);
-
-        log_d(" last time = %d, start time = %d, cur time = %d",last_start_sync_time,start_time,cur_time);
-
-        if (cur_time > start_time || cur_time > last_start_sync_time)
-        {
-            m_tomato_ripen_num = 0;
-            Prop::set<int>(Prop::tomato_today,m_tomato_ripen_num, false, false,true);
-        }
-
-        m_tomato_ripen_num = Prop::get<int>(Prop::tomato_today);
-
-        m_tomato_ripen_total = Prop::get<int>(Prop::pomodoro);
+//        cur_time = get_ymd(get_epoch());
+//
+//        start_time = Prop::get<int>(Prop::start_sync_time);
+//
+//        log_d(" last time = %d, start time = %d, cur time = %d",last_start_sync_time,start_time,cur_time);
+//
+//        if (cur_time > start_time || cur_time > last_start_sync_time)
+//        {
+//            m_tomato_ripen_num = 0;
+//            Prop::set<int>(Prop::tomato_today,m_tomato_ripen_num, false, false,true);
+//        }
+//
+//        m_tomato_ripen_num = Prop::get<int>(Prop::tomato_today);
+//
+//        m_tomato_ripen_total = Prop::get<int>(Prop::pomodoro);
     }
 
     bool UITomatoClock::_initialize()
@@ -397,10 +378,10 @@ namespace UI
         lv_obj_set_style_radius(m_lay_total, 10, 0);
         lv_obj_align(m_lay_total, LV_ALIGN_TOP_MID, 0, 20);
 
-        lv_img_set_src(m_img_tomato_total,&TomatoTotal);
+//        lv_img_set_src(m_img_tomato_total,&TomatoTotal);
         lv_obj_align(m_img_tomato_total, LV_ALIGN_CENTER, 20, 0);
 
-        lv_img_set_src(m_img_tomato_sum,&TomatoSum);
+//        lv_img_set_src(m_img_tomato_sum,&TomatoSum);
         lv_obj_align(m_img_tomato_sum, LV_ALIGN_CENTER, -5, 10);
 
         lv_obj_align(m_label_tomato_today, LV_ALIGN_CENTER, 0, 0);
@@ -425,23 +406,19 @@ namespace UI
 
     bool UITomatoStatistics::_initialize()
     {
-        m_tomato_today = Prop::get<int>(Prop::tomato_today);  // 获取番茄总数
-
-        m_tomato_total = Prop::get<int>(Prop::pomodoro);  // 获取历史番茄总数
+//        m_tomato_today = Prop::get<int>(Prop::tomato_today);  // 获取番茄总数
+//
+//        m_tomato_total = Prop::get<int>(Prop::pomodoro);  // 获取历史番茄总数
 
         update_text();
 
         return true;
     }
 
-	void UITomatoStatistics::left_input_cb(InputData data)
-	{
-
-	}
-
-	void UITomatoStatistics::right_input_cb(InputData data)
-	{
-	}
+    bool UITomatoStatistics::_handleInput(InputEvtType &&input)
+    {
+        return true;
+    }
 
     void UITomatoStatistics::update_text()
     {

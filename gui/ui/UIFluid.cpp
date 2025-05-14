@@ -3,13 +3,12 @@
 //
 
 #include "UIFluid.h"
-#include "tools.h"
-#include "Sense.h"
-#include "Plant.h"
-#include "SysOld.h"
 #include "ThemeInterface.h"
+#include "Lang.h"
+#include "interface.h"
 
 namespace UI {
+#define PI 3.1415926535897932384626433832795
     void WaveUnit::update_data() {
         data.resize(wl);
         double k = 2 * PI / (double) wl;
@@ -103,7 +102,7 @@ namespace UI {
 		lv_canvas_set_buffer(m_canvas, m_canvas_buf.data(), m_tank_size, m_tank_size, LV_IMG_CF_TRUE_COLOR);
 		lv_obj_align(m_canvas, LV_ALIGN_CENTER, 0, 0);
 		lv_canvas_fill_bg(m_canvas, WATER_TANK_ENV_COLOR, LV_OPA_COVER);
-		label_set_style(m_bottom_label, &ba_30);
+        label_set_style(m_bottom_label, &ba_30);
 		lv_obj_align(m_bottom_label, LV_ALIGN_CENTER, 0, 50);
 		lv_obj_align(m_top_text.get_origin_obj(), LV_ALIGN_TOP_MID, 0, 20);
 		lv_label_set_text(m_bottom_label, "");
@@ -136,91 +135,91 @@ namespace UI {
     }
 
     void UIFluid::update_status(bool force) {
-        Plant &plant = Plant::instance();
-        bool t_analyzing = plant.analyzing();
-        int t_status = plant.get_status().water_status;
-        int plant_type = Prop::get<int>(Prop::plant_type);
-        bool t_has_pot = Prop::get<bool>(Prop::has_pot);
-        if (m_plant_type != plant_type) {
-            m_plant_type = plant_type;
-            if (!plant_type) {
-                m_top_text.update(THEME_TEXT_APPEND_COLOR(Lang::ui_fluid_select_plant,Theme::palette_notice));
-                return;
-            }
-        }
-        if (force || m_analyzing != t_analyzing || m_watering_status != t_status || m_has_pot != t_has_pot) {
-            if (t_analyzing) {
-                if (t_has_pot) {
-                    m_top_text.update(THEME_TEXT_CONTENT(Lang::ui_fluid_analy_ten_mins));
-                } else {
-                    m_top_text.update(THEME_TEXT_CONTENT(Lang::ui_fluid_analy_put_plant));
-                }
-                m_analyzing = t_analyzing;
-            } else {
-                if (plant.get_status().water_status == Plant::just_add_water) {
-                    m_top_text.update(THEME_TEXT_CONTENT(Lang::ui_fluid_healthy));
-                } else if (plant.get_status().water_status == Plant::tank_dry_no_need) {
-                    m_top_text.update(THEME_TEXT_CONTENT(Lang::ui_fluid_absorbing));
-                }
-                m_watering_status = t_status;
-            }
-        }
-        m_has_pot = t_has_pot;
+//        Plant &plant = Plant::instance();
+//        bool t_analyzing = plant.analyzing();
+//        int t_status = plant.get_status().water_status;
+//        int plant_type = Prop::get<int>(Prop::plant_type);
+//        bool t_has_pot = Prop::get<bool>(Prop::has_pot);
+//        if (m_plant_type != plant_type) {
+//            m_plant_type = plant_type;
+//            if (!plant_type) {
+//                m_top_text.update(THEME_TEXT_APPEND_COLOR(Lang::ui_fluid_select_plant,Theme::palette_notice));
+//                return;
+//            }
+//        }
+//        if (force || m_analyzing != t_analyzing || m_watering_status != t_status || m_has_pot != t_has_pot) {
+//            if (t_analyzing) {
+//                if (t_has_pot) {
+//                    m_top_text.update(THEME_TEXT_CONTENT(Lang::ui_fluid_analy_ten_mins));
+//                } else {
+//                    m_top_text.update(THEME_TEXT_CONTENT(Lang::ui_fluid_analy_put_plant));
+//                }
+//                m_analyzing = t_analyzing;
+//            } else {
+//                if (plant.get_status().water_status == Plant::just_add_water) {
+//                    m_top_text.update(THEME_TEXT_CONTENT(Lang::ui_fluid_healthy));
+//                } else if (plant.get_status().water_status == Plant::tank_dry_no_need) {
+//                    m_top_text.update(THEME_TEXT_CONTENT(Lang::ui_fluid_absorbing));
+//                }
+//                m_watering_status = t_status;
+//            }
+//        }
+//        m_has_pot = t_has_pot;
     }
 
     void UIFluid::routine() {
-        update_status(false);
-        set_target_y_from_percent(Sense::instance().get_current_water_level() / WATER_TANK_VOLUME);
-        if (m_current_y < m_target_y) {
-            /* dropping */
-            m_current_y += (m_target_y - m_current_y) / 5 + 1;
-            m_current_y = min(m_current_y, m_tank_size);
-        } else if (m_current_y > m_target_y) {
-            /* rising */
-            m_current_y -= (m_current_y - m_target_y) / 5 + 1;
-            m_current_y = max(m_current_y, 1);
-        }
-        /* add wave effect during dramatic change */
-        if (m_current_y != m_last_level) {
-            set_amp(m_current_amp + 1);
-            m_stable_cnt = 0;
-            m_last_level = m_current_y;
-            /* stabilize water level when no change anymore */
-        } else if (++m_stable_cnt > WATER_TANK_STABLE_UNIT_CNT) {
-            set_amp(m_current_amp - 1);
-            m_stable_cnt = 0;
-        }
-        /* add wave moving effect */
-        m_wave_front.move_hor(m_current_speed);
-        m_wave_back.move_hor(-1 * m_current_speed / 2);
-
-        m_wave_front.update_data();
-        m_wave_back.update_data();
-
-        /* todo
-         * 1. horizontal chunk set
-         * 2. only render wave part
-         * 3. only render changed parts
-         * */
-        m_wave_y_start = m_current_y - m_current_amp;
-        m_wave_y_end = m_current_y + m_current_amp;
-        render_top();
-        render_wave();
-        render_bottom();
-
-        if (m_current_amp > WATER_TANK_MIN_AMP + 1) {
-            stable_cb(false);
-        } else {
-            stable_cb(true);
-        }
-
-        lv_obj_invalidate(m_canvas);
-
-        render_text();
-//        std::string value_string = std::to_string((int) std::round(current_level)) + "mL";
-//        update_bottom_label(value_string.c_str(), lv_color_white());
-
-        Base::routine();
+//        update_status(false);
+//        set_target_y_from_percent(Sense::instance().get_current_water_level() / WATER_TANK_VOLUME);
+//        if (m_current_y < m_target_y) {
+//            /* dropping */
+//            m_current_y += (m_target_y - m_current_y) / 5 + 1;
+//            m_current_y = min(m_current_y, m_tank_size);
+//        } else if (m_current_y > m_target_y) {
+//            /* rising */
+//            m_current_y -= (m_current_y - m_target_y) / 5 + 1;
+//            m_current_y = max(m_current_y, 1);
+//        }
+//        /* add wave effect during dramatic change */
+//        if (m_current_y != m_last_level) {
+//            set_amp(m_current_amp + 1);
+//            m_stable_cnt = 0;
+//            m_last_level = m_current_y;
+//            /* stabilize water level when no change anymore */
+//        } else if (++m_stable_cnt > WATER_TANK_STABLE_UNIT_CNT) {
+//            set_amp(m_current_amp - 1);
+//            m_stable_cnt = 0;
+//        }
+//        /* add wave moving effect */
+//        m_wave_front.move_hor(m_current_speed);
+//        m_wave_back.move_hor(-1 * m_current_speed / 2);
+//
+//        m_wave_front.update_data();
+//        m_wave_back.update_data();
+//
+//        /* todo
+//         * 1. horizontal chunk set
+//         * 2. only render wave part
+//         * 3. only render changed parts
+//         * */
+//        m_wave_y_start = m_current_y - m_current_amp;
+//        m_wave_y_end = m_current_y + m_current_amp;
+//        render_top();
+//        render_wave();
+//        render_bottom();
+//
+//        if (m_current_amp > WATER_TANK_MIN_AMP + 1) {
+//            stable_cb(false);
+//        } else {
+//            stable_cb(true);
+//        }
+//
+//        lv_obj_invalidate(m_canvas);
+//
+//        render_text();
+////        std::string value_string = std::to_string((int) std::round(current_level)) + "mL";
+////        update_bottom_label(value_string.c_str(), lv_color_white());
+//
+//        Base::routine();
     }
 
     void UIFluid::render_top() {
@@ -279,7 +278,7 @@ namespace UI {
     }
 
     void UIFluid::render_text() {
-        lv_label_set_text(m_bottom_label, (std::to_string(Prop::get<int>(Prop::water_level)) + "mL").c_str());
+        //lv_label_set_text(m_bottom_label, (std::to_string(Prop::get<int>(Prop::water_level)) + "mL").c_str());
     }
 
     void UIFluid::stable_cb(bool stable) {
