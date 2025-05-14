@@ -6,7 +6,9 @@
 #include <fstream>
 #include <dirent.h>
 #include <memory>
+
 #include "log.h"
+#include "filepath.h"
 
 #define LANGUAGE_FILE_PATH     "/theme/language/language.json"
 #define FONT_FILE_PATH         "/theme/font/"

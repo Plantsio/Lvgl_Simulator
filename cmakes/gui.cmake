@@ -15,4 +15,9 @@ list(APPEND GUI_INCLUDES
         ${GUI_PATH}/theme
         ${GUI_PATH}/ui)
 
-file(GLOB_RECURSE GUI_SOURCES  ${GUI_PATH}/*.cpp ${GUI_PATH}/components/*.cpp  ${GUI_PATH}/theme/*.cpp  ${GUI_PATH}/ui/*.cpp)
+file(GLOB_RECURSE GUI_SOURCES
+        ${GUI_PATH}/*.cpp
+        ${GUI_PATH}/components/*.cpp
+        ${GUI_PATH}/theme/*.cpp
+        ${GUI_PATH}/ui/*.cpp
+        ${GUI_PATH}/embedded/*.cpp)

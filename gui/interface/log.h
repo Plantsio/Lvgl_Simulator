@@ -27,7 +27,7 @@
 
 #include <cstdio>
 
-#define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter "[" #letter "][%s:%u] %s(): " format ARDUHAL_LOG_RESET_COLOR "\n",__FILE__, __LINE__, __FUNCTION__
+#define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter "[" #letter "][%s:%u] %s(): " format LOG_RESET_COLOR "\n",__FILE__, __LINE__, __FUNCTION__
 
 #define log_e(format, ...) printf(LOG_FORMAT(E, format), ##__VA_ARGS__)
 #define log_w(format, ...) printf(LOG_FORMAT(W, format), ##__VA_ARGS__)
