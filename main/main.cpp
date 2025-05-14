@@ -17,6 +17,8 @@
 #include "demos/lv_demos.h"
 #include "sdl/sdl.h"
 
+#include "UITutorial.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -91,7 +93,9 @@ int main(int argc, char **argv)
 //  lv_example_flex_3();
 //  lv_example_label_1();
 
-    lv_demo_widgets();
+//    lv_demo_widgets();
+
+test();
 
   while(1) {
       /* Periodically call the lv_task handler.
