@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorRoot">
+  <BehaviorTree ID="BehaviorRoot">
+    <Dispatcher>
+      <Event index="0" priority="1" name="Daily">
+        <Control ID="Sequence">
+          <Action n="1" ID="anim" name="eat_sun.a"/>
+          <Action n="2" ID="anim" name="eat_sun.b"/>
+          <Action n="1" ID="anim" name="eat_sun.c"/>
+        </Control>
+      </Event>
+    </Dispatcher>
+  </BehaviorTree>
+</root>
