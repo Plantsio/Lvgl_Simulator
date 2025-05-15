@@ -6,6 +6,11 @@
 
 namespace UI
 {
+    void Animation::anim_fade(void *var, int32_t value)
+    {
+        lv_obj_set_style_opa((lv_obj_t *) var, value, 0);
+    }
+
 	void Animation::anim_fade_in(lv_obj_t *obj,uint32_t duration,uint32_t delay)
 	{
 		anim_create(obj,anim_fade_cb,LV_OPA_TRANSP,LV_OPA_COVER,

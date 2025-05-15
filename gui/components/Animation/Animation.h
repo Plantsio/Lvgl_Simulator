@@ -13,6 +13,8 @@ namespace UI
 	class Animation
 	{
 	public:
+        static void anim_fade(void *var, int32_t value);
+
 		static void anim_fade_in(lv_obj_t *obj,uint32_t duration,uint32_t delay);
 
 		static void anim_fade_out(lv_obj_t *obj,uint32_t duration,uint32_t delay);
