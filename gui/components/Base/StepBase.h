@@ -20,9 +20,16 @@ namespace UI
     public:
         using HandlerCB = std::function<void()>;
 
-        using nextReadyCB = std::function<bool()>;
-        using prevReadyCB = std::function<bool()>;
+        using ReadyCB = std::function<bool()>;
         using executeCB = std::function<bool()>;
+
+        struct StepUnit
+        {
+            ReadyCB currentReady;
+            ReadyCB nextReady;
+            ReadyCB prevReady;
+            executeCB execute;
+        };
 
 	public:
 		 StepBase(HandlerCB start,HandlerCB end);
@@ -33,36 +40,42 @@ namespace UI
     public:
         void stepHandler();
 
-	protected:
         void start();
 
         void stop();
 
+        [[nodiscard]] bool finished() const;
+
+    protected:
         bool enableAutoStep();
 
-        [[nodiscard]] bool is_finished() const;
-
-        void registerStepCB(executeCB cb);
-
-        virtual bool prevReady();
-
-        virtual bool nextReady();
+        void updateStepPeriod(uint32_t period);
 
         static void timer_cb(lv_timer_t *timer);
 
-	protected:
+    protected:
+        void registerStepCB(executeCB exe,
+                            ReadyCB currentReady = [](){return true;},
+                            ReadyCB nextReady = [](){return true;},
+                            ReadyCB prevReady = [](){return true;}
+                            );
+
+        void registerStartCB(HandlerCB start);
+
+        void registerStopCB(HandlerCB stop);
+
+    private:
         HandlerCB mStartCB;
         HandlerCB mStopCB;
 
-    private:
-        bool started = false;
-        bool finished = false;
+        bool mStarted = false;
+        bool mFinished = false;
 
         int mCurrentStep = 0;
 
 		lv_timer_t *mTimer = nullptr;
 
-        std::vector<executeCB> mStepList{};
+        std::vector<StepUnit> mStepList{};
 	};
 }
 

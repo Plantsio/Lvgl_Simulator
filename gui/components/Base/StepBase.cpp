@@ -26,28 +26,29 @@ namespace UI
 
     void StepBase::stepHandler()
     {
-        if (nextReady())
+        auto curReady = mStepList[mCurrentStep].currentReady;
+        auto nextReady = mStepList[mCurrentStep].nextReady;
+        auto prevReady= mStepList[mCurrentStep].prevReady;
+        auto exe = mStepList[mCurrentStep].execute;
+
+        if (curReady && curReady())
         {
-            if (mCurrentStep <= mStepList.size())
-            {
-                auto exe = mStepList[mCurrentStep];
-                if (exe)
-                    exe();
-                mCurrentStep ++;
-            }
+            if (exe)
+                exe();
+        }
+
+        if (prevReady && prevReady())
+        {
+            if (mCurrentStep >= 0)
+                mCurrentStep --;
             else
                 stop();
         }
 
-        if (prevReady())
+        if (nextReady || nextReady())
         {
-            if (mCurrentStep >= 0)
-            {
-                auto exe = mStepList[mCurrentStep];
-                if (exe)
-                    exe();
-                mCurrentStep --;
-            }
+            if (mCurrentStep <= mStepList.size())
+                mCurrentStep ++;
             else
                 stop();
         }
@@ -56,7 +57,7 @@ namespace UI
 	void StepBase::start()
 	{
         log_d("start ......");
-		if (started)
+		if (mStarted)
 			return;
 
         if (mStartCB)
@@ -65,24 +66,29 @@ namespace UI
         if (mTimer)
             lv_timer_resume(mTimer);
 
-		started = true;
-		finished = false;
+        mStarted = true;
+        mFinished = false;
 	}
 
 	void StepBase::stop()
 	{
         log_d("ui end ...");
 
-		started = false;
-		finished = true;
+        mStarted = false;
+        mFinished = true;
 
         if (mTimer)
-        lv_timer_pause(mTimer);
+            lv_timer_pause(mTimer);
 
         if (mStopCB)
             mStopCB();
 
 	}
+
+    bool StepBase::finished() const
+    {
+        return mFinished;
+    }
 
     bool StepBase::enableAutoStep()
     {
@@ -96,12 +102,10 @@ namespace UI
         return true;
     }
 
-	bool StepBase::is_finished() const
-	{
-		return finished;
-	}
-
-
+    void StepBase::updateStepPeriod(uint32_t period)
+    {
+        lv_timer_set_period(mTimer,period);
+    }
 
 	void StepBase::timer_cb(lv_timer_t *timer)
 	{
@@ -110,21 +114,18 @@ namespace UI
         TimerStep->stepHandler();
 	}
 
-    void StepBase::registerStepCB(executeCB cb)
+    void StepBase::registerStepCB(executeCB exe,ReadyCB currentReady,ReadyCB nextReady,ReadyCB prevReady)
     {
-        mStepList.push_back(std::move(cb));
+        mStepList.push_back({std::move(currentReady),std::move(nextReady),std::move(prevReady),std::move(exe)});
     }
 
-    bool StepBase::prevReady()
+    void StepBase::registerStartCB(HandlerCB start)
     {
-        return false;
+        mStartCB = std::move(start);
     }
 
-    bool StepBase::nextReady()
+    void StepBase::registerStopCB(HandlerCB stop)
     {
-        return true;
+        mStopCB = std::move(stop);
     }
-
-    void nextUpdateTimerPeriod()
-    {}
 }
