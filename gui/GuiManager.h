@@ -20,9 +20,11 @@ namespace Gui
 
 enum InputEvent
 {
-    INPUT_LEFT,
-    INPUT_RIGHT,
-    INPUT_FRONT,
+    BtnSrcLeft = 0,
+    BtnSrcRight,
+    BtnSrcBack,
+    BtnSrcFront,
+    BtnSrcPlant,
 };
 
 enum InputType {
