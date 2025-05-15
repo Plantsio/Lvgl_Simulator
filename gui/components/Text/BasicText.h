@@ -22,9 +22,11 @@ namespace UI
 	public:
 		void set_font_size(uint32_t size);
 
-		void update(const std::string &content, bool anim_on = true, uint32_t delay = 0);
+        void align(lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
 
-		[[nodiscard]] lv_obj_t *get_origin_obj() const;
+        void alignTo(const BasicText &base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
+
+		void update(const std::string &content, bool anim_on = true, uint32_t delay = 0);
 
 	private:
 		static void fade_in(lv_anim_t *anim);
@@ -32,12 +34,12 @@ namespace UI
 		void update();
 
 	private:
-		lv_obj_t *m_base_label= nullptr;
+		lv_obj_t *mBaseLabel= nullptr;
 
-		uint32_t m_fade_in_t;
-		uint32_t m_fade_out_t;
+		uint32_t mFadeInTime;
+		uint32_t mFadeOutTime;
 
-		std::string m_content;
+		std::string mContent;
 	};
 }
 
