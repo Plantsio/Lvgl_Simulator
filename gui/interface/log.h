@@ -2,6 +2,8 @@
 // Created by Huwensong on 2025/5/14.
 //
 
+#include "SDL_log.h"
+
 #ifndef SIMULATOR_LOG_H
 #define SIMULATOR_LOG_H
 
@@ -33,36 +35,34 @@
 #define LOG_COLOR_D       LOG_COLOR(LOG_COLOR_CYAN)
 #define LOG_COLOR_V       LOG_COLOR(LOG_COLOR_GRAY)
 
-#include <cstdio>
-
-#define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter "[" #letter "][%s:%u] %s(): " format LOG_RESET_COLOR "\n",__FILE__, __LINE__, __FUNCTION__
+#define LOG_FORMAT(letter, format)  "[" #letter "][%s:%u] %s(): " format "\n",__FILE__, __LINE__, __FUNCTION__
 
 #if LOG_LEVEL >= LOG_LEVEL_ERROR
-#define log_e(format, ...) printf(LOG_FORMAT(E, format), ##__VA_ARGS__)
+#define log_e(format, ...) SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,LOG_FORMAT(E, format), ##__VA_ARGS__)
 #else
 #define log_e(format, ...) do {} while(0)
 #endif
 
 #if LOG_LEVEL >= LOG_LEVEL_WARNING
-#define log_w(format, ...) printf(LOG_FORMAT(W, format), ##__VA_ARGS__)
+#define log_w(format, ...) SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,LOG_FORMAT(W, format), ##__VA_ARGS__)
 #else
 #define log_w(format, ...) do {} while(0)
 #endif
 
 #if LOG_LEVEL >= LOG_LEVEL_INFO
-#define log_i(format, ...) printf(LOG_FORMAT(I, format), ##__VA_ARGS__)
+#define log_i(format, ...) SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION,LOG_FORMAT(I, format), ##__VA_ARGS__)
 #else
 #define log_i(format, ...) do {} while(0)
 #endif
 
 #if LOG_LEVEL >= LOG_LEVEL_DEBUG
-#define log_d(format, ...) printf(LOG_FORMAT(D, format), ##__VA_ARGS__)
+#define log_d(format, ...) SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION,LOG_FORMAT(D, format), ##__VA_ARGS__)
 #else
 #define log_d(format, ...) do {} while(0)
 #endif
 
 #if LOG_LEVEL >= LOG_LEVEL_VERBOSE
-#define log_v(format, ...) printf(LOG_FORMAT(V, format), ##__VA_ARGS__)
+#define log_v(format, ...) SDL_LogVerbose(SDL_LOG_CATEGORY_APPLICATION,LOG_FORMAT(V, format), ##__VA_ARGS__)
 #else
 #define log_v(format, ...) do {} while(0)
 #endif
