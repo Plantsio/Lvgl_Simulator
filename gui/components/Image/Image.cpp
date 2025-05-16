@@ -3,16 +3,20 @@
 //
 
 #include "Image.h"
-#include "fcntl.h"
+
+#include <fstream>
 #include "log.h"
 #include "interface.h"
 #include "Animation.h"
+#include "filepath.h"
 
 namespace UI
 {
 	Image::Image(lv_obj_t *parent) :
     m_image(lv_img_create(parent))
-	{}
+	{
+        lv_obj_align(m_image, LV_ALIGN_CENTER, 0, 0);
+    }
 
 	Image::~Image()
 	{
@@ -24,7 +28,7 @@ namespace UI
 	{
 		clear();
 
-		if (!load_image(get_assets_path(name)))
+		if (!load_image(path({ASSETS_DIR,name + ".mjpeg"})))
 		{
 			log_e("Failed to load image");
 			return;
@@ -58,22 +62,19 @@ namespace UI
 
 	bool Image::load_image(const std::string &path)
 	{
-		int32_t ret_size = 0;
-
 		log_d("path = %s",path.c_str());
 
-		int fd = open(path.c_str(),O_RDONLY);
-
-		if (fd < 0)
-		{
-			log_e("Image: Failed to open file");
-			return false;
-		}
+        std::ifstream file(path);
+        if (!file.is_open())
+        {
+            log_e("Image: Failed to open file");
+            return false;
+        }
 
 		//read size of one frame
-		ret_size = read(fd,&m_frame_size,sizeof(uint32_t));
+		file.read((char *)&m_frame_size,sizeof(uint32_t));
 
-		if(ret_size < 0 || m_frame_size == 0)
+		if(file.gcount() < 0 || m_frame_size == 0)
 		{
 			log_e("read frame_size error");
 			return false;
@@ -87,9 +88,9 @@ namespace UI
 			return false;
 		}
 
-		ret_size = read(fd,m_load_cache,m_frame_size);
+        file.read((char *)m_load_cache,m_frame_size);
 
-		if (ret_size != m_frame_size)
+		if (file.gcount() != m_frame_size)
 		{
 			log_e("read frame error");
 			free(m_load_cache);
@@ -98,7 +99,7 @@ namespace UI
 
 		log_d("load image success");
 
-		close(fd);
+		file.close();
 
 		return true;
 	}

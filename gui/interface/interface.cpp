@@ -24,3 +24,8 @@ void label_set_style(lv_obj_t *label, const lv_font_t *font, lv_color_t color, l
 void bar_set_default_style(lv_obj_t *bar) {
     lv_obj_remove_style_all(bar);  /*To have a clean start*/
 }
+
+namespace Sys
+{
+    void shutdown(){}
+}

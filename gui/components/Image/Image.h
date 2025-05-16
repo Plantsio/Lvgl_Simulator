@@ -39,7 +39,7 @@ namespace UI
 	private:
 		lv_obj_t *m_image;
 
-		JPEGDEC m_mjpeg_dec;
+		JPEGDEC m_mjpeg_dec{};
 
 		lv_img_dsc_t m_img_desc{};
 

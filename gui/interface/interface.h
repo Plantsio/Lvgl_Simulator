@@ -135,7 +135,7 @@ public:
 
 namespace Sys
 {
-    void shutdown() {}
+    void shutdown();
 }
 
 #endif //SIMULATOR_INTERFACE_H
