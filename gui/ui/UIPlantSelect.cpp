@@ -16,8 +16,8 @@ namespace UI
 	m_indicator(m_scr)
 	{
 		m_middle_text.set_font_size(30);
-		lv_obj_align(m_middle_text.get_origin_obj(), LV_ALIGN_CENTER, 0, -30);
-		lv_obj_align_to(m_top_text.get_origin_obj(), m_middle_text.get_origin_obj(), LV_ALIGN_OUT_BOTTOM_MID, 0, 30);
+		//lv_obj_align(m_middle_text.get_origin_obj(), LV_ALIGN_CENTER, 0, -30);
+		//lv_obj_align_to(m_top_text.get_origin_obj(), m_middle_text.get_origin_obj(), LV_ALIGN_OUT_BOTTOM_MID, 0, 30);
 	}
 
 	bool UIPlantSelect::_initialize()

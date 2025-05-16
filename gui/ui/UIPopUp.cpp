@@ -40,8 +40,8 @@ namespace UI {
     }
 
     void UIPopUp::realign() const {
-        lv_obj_align(m_text_main.get_origin_obj(), LV_ALIGN_CENTER, 0, -60);
-        lv_obj_align_to(m_text_sub.get_origin_obj(), m_text_main.get_origin_obj(), LV_ALIGN_OUT_BOTTOM_MID, 0, 40);
+        //lv_obj_align(m_text_main.get_origin_obj(), LV_ALIGN_CENTER, 0, -60);
+        //lv_obj_align_to(m_text_sub.get_origin_obj(), m_text_main.get_origin_obj(), LV_ALIGN_OUT_BOTTOM_MID, 0, 40);
     }
 
     void UIPopUp::create_confirm_ui() {

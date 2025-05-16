@@ -104,7 +104,7 @@ namespace UI {
 		lv_canvas_fill_bg(m_canvas, WATER_TANK_ENV_COLOR, LV_OPA_COVER);
         label_set_style(m_bottom_label, &ba_30);
 		lv_obj_align(m_bottom_label, LV_ALIGN_CENTER, 0, 50);
-		lv_obj_align(m_top_text.get_origin_obj(), LV_ALIGN_TOP_MID, 0, 20);
+		//lv_obj_align(m_top_text.get_origin_obj(), LV_ALIGN_TOP_MID, 0, 20);
 		lv_label_set_text(m_bottom_label, "");
 #ifndef Ivy
 		lv_obj_add_event_cb(m_scr, mouse_cb, LV_EVENT_CLICKED, this);

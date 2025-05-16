@@ -52,13 +52,13 @@ namespace UI
         lv_obj_set_style_text_color(time_label,lv_color_white(),0);
         lv_obj_set_style_text_align(time_label,LV_TEXT_ALIGN_CENTER,0);
 
-        lv_obj_align(m_top_text.get_origin_obj(),LV_ALIGN_TOP_MID,0,10);
-		THEME_SET_FONT_SIZE(m_top_text.get_origin_obj(),16);
+        //lv_obj_align(m_top_text.get_origin_obj(),LV_ALIGN_TOP_MID,0,10);
+		//THEME_SET_FONT_SIZE(m_top_text.get_origin_obj(),16);
 
-        lv_obj_align(m_bottom_text.get_origin_obj(),LV_ALIGN_BOTTOM_MID,0,-15);
-        lv_obj_set_width(m_bottom_text.get_origin_obj(),200);
-        lv_label_set_long_mode(m_bottom_text.get_origin_obj(),LV_LABEL_LONG_SCROLL_CIRCULAR);
-		THEME_SET_FONT_SIZE(m_bottom_text.get_origin_obj(),16);
+        //lv_obj_align(m_bottom_text.get_origin_obj(),LV_ALIGN_BOTTOM_MID,0,-15);
+        //lv_obj_set_width(m_bottom_text.get_origin_obj(),200);
+        //lv_label_set_long_mode(m_bottom_text.get_origin_obj(),LV_LABEL_LONG_SCROLL_CIRCULAR);
+		//THEME_SET_FONT_SIZE(m_bottom_text.get_origin_obj(),16);
 
         m_clock_seconds = CLOCK_MINUTES * TIME_BASE + CLOCK_SECONDS;
 
