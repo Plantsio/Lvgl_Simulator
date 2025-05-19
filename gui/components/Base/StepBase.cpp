@@ -26,14 +26,15 @@ namespace UI
         auto prevReady= mStepList[mCurrentStep].prevReady;
         auto exe = mStepList[mCurrentStep].execute;
 
+        bool success = false;
         if (curReady && curReady())
         {
             log_d("current");
             if (exe)
-                exe();
+                success = exe();
         }
 
-        if (prevReady && prevReady())
+        if (prevReady && prevReady() && success)
         {
             log_d("prev");
             mCurrentStep --;
@@ -41,7 +42,7 @@ namespace UI
                 stop();
         }
 
-        if (nextReady && nextReady())
+        if (nextReady && nextReady() && success)
         {
             log_d("next");
             mCurrentStep ++;

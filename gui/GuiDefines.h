@@ -2,8 +2,8 @@
 // Created by Huwensong on 2025/5/13.
 //
 
-#ifndef SIMULATOR_GUIMANAGER_H
-#define SIMULATOR_GUIMANAGER_H
+#ifndef SIMULATOR_GUIDEFINES_H
+#define SIMULATOR_GUIDEFINES_H
 
 #include <any>
 #include <memory>
@@ -48,27 +48,27 @@ struct InputEvtType
     InputData  data;
 };
 
-class GuiManager
+class GuiDefines
 {
 public:
     //region Singleton
-    static GuiManager &instance() {
-        static std::shared_ptr<GuiManager> instance(new GuiManager());
+    static GuiDefines &instance() {
+        static std::shared_ptr<GuiDefines> instance(new GuiDefines());
         return *instance;
     }
 
-    GuiManager(const GuiManager &) = delete;
+    GuiDefines(const GuiDefines &) = delete;
 
-    GuiManager(GuiManager &&) = delete;
+    GuiDefines(GuiDefines &&) = delete;
 
-    GuiManager &operator=(const GuiManager &) = delete;
+    GuiDefines &operator=(const GuiDefines &) = delete;
 
-    GuiManager &operator=(GuiManager &&) = delete;
+    GuiDefines &operator=(GuiDefines &&) = delete;
     //endregion
 
 public:
-    GuiManager() = default;
+    GuiDefines() = default;
 };
 
 
-#endif //SIMULATOR_GUIMANAGER_H
+#endif //SIMULATOR_GUIDEFINES_H

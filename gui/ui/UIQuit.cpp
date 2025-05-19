@@ -3,7 +3,7 @@
 //
 
 #include "UIQuit.h"
-#include "GuiManager.h"
+#include "GuiDefines.h"
 //#include "Store.h"
 
 namespace UI {

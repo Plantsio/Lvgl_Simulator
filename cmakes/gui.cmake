@@ -12,6 +12,7 @@ list(APPEND GUI_INCLUDES
         ${GUI_PATH}/components/Text
         ${GUI_PATH}/miscellaneous
         ${GUI_PATH}/interface
+        ${GUI_PATH}/indev
         ${GUI_PATH}/theme
         ${GUI_PATH}/ui)
 

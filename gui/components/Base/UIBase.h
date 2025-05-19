@@ -12,7 +12,9 @@
 
 #include "lvgl.h"
 #include "DeInitializable.h"
-#include "GuiManager.h"
+#include "GuiDefines.h"
+
+#include "Indev.h"
 
 namespace UI {
     class Base : public DeInitializable {
@@ -47,6 +49,8 @@ namespace UI {
         uint32_t m_input_mask = 0;
 
         ObjPtr m_obj;    /* todo would it be better to use weakPtr */
+
+        Indev mIndev;
     };
 
 /* Default empty UI class */

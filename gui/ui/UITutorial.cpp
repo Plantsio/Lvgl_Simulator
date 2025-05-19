@@ -126,7 +126,6 @@ namespace UI
     {
         registerStepCB([&](){
             mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_interact));
-            updateStepPeriod(3000);
             return true;
         });
 
@@ -152,20 +151,17 @@ namespace UI
             {
                 Animation::anim_fade_out(circle, 2000,0);
             }
-            updateStepPeriod( 4000);
             return true;
         });
 
         registerStepCB([&](){
-            mIndicator.enable_visible_flashing(Indicator::ALL,1000,0,1000,800,2);
-            updateStepPeriod( 5000);
+            mIndicator.enable_visible_flashing(Indicator::ALL,1000,0,1000,500,2);
             return true;
         });
 
         registerStepCB([&](){
             mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_left));
             mIndicator.enable_visible(Indicator::LEFT,true,1000,3000);
-            updateStepPeriod( 10);
             return true;
         });
 
@@ -179,7 +175,6 @@ namespace UI
         registerStepCB([&](){
             mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_great));
             mIndicator.disable_visible(Indicator::RIGHT, true, 600);
-            updateStepPeriod( 2000);
             return true;
         },[&](){ return mInputEvtType.index == BtnSrcRight;});
 
@@ -436,7 +431,7 @@ namespace UI
 	UITutorial::UITutorial(ObjPtr obj) :
 	Base(std::move(obj))
 	{
-        uiList = {Tu_Intro,Tu_TouchBar,Tu_App,Tu_Water,Tu_WaterAssist,Tu_PlantDetect,Tu_Final};
+        uiList = {Tu_TouchBar,Tu_App,Tu_Water,Tu_WaterAssist,Tu_PlantDetect,Tu_Final};
 	}
 
 	bool UITutorial::_initialize()
@@ -460,6 +455,7 @@ namespace UI
 
     bool UITutorial::_handleInput(InputEvtType &&input)
     {
+        log_d("input src == %d",input.index);
         auto target = std::dynamic_pointer_cast<InputReceiver>(mCurUI);
         if (!target)
             return false;

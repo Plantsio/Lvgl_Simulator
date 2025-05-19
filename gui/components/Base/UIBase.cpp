@@ -5,13 +5,14 @@
 #include "UIBase.h"
 
 #include <utility>
-#include "GuiManager.h"
+#include "GuiDefines.h"
 
 namespace UI {
     Base::Base(ObjPtr obj) :
             m_scr(lv_obj_create(nullptr)),
             m_obj(std::move(obj)) {
         lv_obj_set_style_bg_color(m_scr, lv_color_black(), 0);
+        mIndev.attachIndev(m_scr,[&](InputEvtType &input){return _handleInput(std::forward<InputEvtType>(input));});
     }
 
     Base::~Base() {
