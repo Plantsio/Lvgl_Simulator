@@ -16,7 +16,7 @@ namespace UI
 {
 	//region intro
 	TuIntro::TuIntro(lv_obj_t *parent) :
-    TuComponentBase(),
+    TuBase(),
     mMainText(parent),
     mSubText(parent)
 	{
@@ -58,8 +58,9 @@ namespace UI
             return true;
         });
 
-        registerStopCB([&](){
+        registerStepCB([&](){
             update("", "");
+            return true;
         });
 
         enableAutoStep();
@@ -86,7 +87,7 @@ namespace UI
 	//endregion
 
 	TuTouchBar::TuTouchBar(lv_obj_t *parent) :
-    TuComponentBase(),
+    TuBase(),
     mTopText(parent),
     mBottomText(parent),
     mIndicator(parent),
@@ -193,7 +194,7 @@ namespace UI
     }
 
 	TuApp::TuApp(lv_obj_t *parent) :
-    TuComponentBase(),
+    TuBase(),
     mTopText(parent),
     mSubText(parent, 300),
     mMidText(parent, 300, 800, 600),
@@ -266,7 +267,7 @@ namespace UI
     }
 
 	TuWater::TuWater(lv_obj_t *parent):
-    TuComponentBase(),
+    TuBase(),
     mTopText(parent),
     mIndicator(parent),
     mImage(parent)
@@ -313,7 +314,7 @@ namespace UI
     }
 
 	TuWaterAssist::TuWaterAssist(lv_obj_t *parent) :
-    TuComponentBase(),
+    TuBase(),
     mTopText(parent),
 	mMidText(parent),
     mBottomText(parent),
@@ -375,7 +376,7 @@ namespace UI
     }
 
 	TuPlantDetect::TuPlantDetect(lv_obj_t *parent) :
-    TuComponentBase(),
+    TuBase(),
     mTopText(parent),
     mIndicator(parent),
     mImage(parent)
@@ -409,7 +410,7 @@ namespace UI
     }
 
 	TuFinal::TuFinal(lv_obj_t *parent) :
-    TuComponentBase(),
+    TuBase(),
 	mMidText(parent)
 	{
         mMidText.set_font_size(30);
@@ -435,63 +436,75 @@ namespace UI
 	UITutorial::UITutorial(ObjPtr obj) :
 	Base(std::move(obj))
 	{
-        uiList = {
-                {std::make_shared<TuIntro>(m_scr), nullptr},
-                {std::make_shared<TuTouchBar>(m_scr), nullptr},
-                {std::make_shared<TuApp>(m_scr), nullptr},
-                {std::make_shared<TuWater>(m_scr), nullptr},
-                {std::make_shared<TuWaterAssist>(m_scr), nullptr},
-                {std::make_shared<TuPlantDetect>(m_scr), nullptr},
-                {std::make_shared<TuFinal>(m_scr), nullptr},
-        };
+        uiList = {Tu_Intro,Tu_TouchBar,Tu_App,Tu_Water,Tu_WaterAssist,Tu_PlantDetect,Tu_Final};
 	}
 
 	bool UITutorial::_initialize()
 	{
-        for (auto &uiComponent : uiList)
-        {
-            if (!uiComponent.stepUI->initialize())
-                return false;
-        }
-        mCurrent = 0;
         return true;
 	}
 
 	void UITutorial::routine()
 	{
-        auto &curComponent = uiList[mCurrent];
-        if (!curComponent.stepUI)
-            return;
-
-		if(curComponent.stepUI->finished())
-		{
-            if (mCurrent <= uiList.size())
-                mCurrent ++;
-            else
-                tutorial_over = true;
-
-		}else
+        if (!mCurUI || mCurUI->finished())
         {
-            curComponent.stepUI->start();
-            if (curComponent.action)
-                curComponent.action();
-        }
+            mCurUI = build(uiList[mCurIndex]);
+            mCurUI->initialize();
+            mCurUI->start();
+            mCurIndex ++;
 
-		if (tutorial_over)
-		{
-			log_d("tutorial over");
-            Sys::shutdown();
-		}
+            if (mCurIndex >= uiList.size())
+                tutorial_over();
+        }
 	}
 
     bool UITutorial::_handleInput(InputEvtType &&input)
     {
-        auto target = std::dynamic_pointer_cast<InputReceiver>(uiList[mCurrent].stepUI);
+        auto target = std::dynamic_pointer_cast<InputReceiver>(mCurUI);
         if (!target)
             return false;
         target->handleInput(input);
 
         return false;
+    }
+
+    std::shared_ptr<TuBase> UITutorial::build(TuIndex index)
+    {
+        switch (index)
+        {
+            case Tu_Intro:
+                log_d("Tu_Intro");
+                return std::make_shared<TuIntro>(m_scr);
+            case Tu_TouchBar:
+                log_d("Tu_TouchBar");
+                return std::make_shared<TuTouchBar>(m_scr);
+            case Tu_App:
+                log_d("Tu_App");
+                return std::make_shared<TuApp>(m_scr);
+            case Tu_ProvTip:
+                log_d("Tu_ProvTip");
+                return std::make_shared<TuTouchBar>(m_scr);
+            case Tu_Water:
+                log_d("Tu_Water");
+                return std::make_shared<TuWater>(m_scr);
+            case Tu_WaterAssist:
+                log_d("Tu_WaterAssist");
+                return std::make_shared<TuWaterAssist>(m_scr);
+            case Tu_PlantDetect:
+                log_d("Tu_PlantDetect");
+                return std::make_shared<TuPlantDetect>(m_scr);
+            case Tu_Final:
+                log_d("Tu_Final");
+                return std::make_shared<TuFinal>(m_scr);
+            default:
+                return nullptr;
+        }
+    }
+
+    void UITutorial::tutorial_over()
+    {
+        log_d("tutorial over");
+        Sys::shutdown();
     }
 }
 

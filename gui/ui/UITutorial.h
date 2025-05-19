@@ -5,13 +5,15 @@
 #ifndef UI_SANDBOX_TUTORIALUI_H
 #define UI_SANDBOX_TUTORIALUI_H
 
+
+#include <stack>
+
 #include "UIBase.h"
 #include "StepBase.h"
 #include "Indicator.h"
 #include "BasicText.h"
 #include "Image.h"
 #include "UIFluidAssist.h"
-//#include "Skin.h"
 
 namespace UI
 {
@@ -24,15 +26,15 @@ namespace UI
         InputEvtType mInputEvtType{};
     };
 
-    class TuComponentBase : public Initializable,public StepBase
+    class TuBase : public Initializable,public StepBase
     {
     public:
-        TuComponentBase():StepBase(){}
+        TuBase():StepBase(){}
     private:
         bool _initialize() override {return true;}
     };
 
-    class TuIntro : public TuComponentBase
+    class TuIntro : public TuBase
 	{
 	public:
 		explicit TuIntro(lv_obj_t *parent);
@@ -51,7 +53,7 @@ namespace UI
         BasicText mSubText;
 	};
 
-    class TuTouchBar : public TuComponentBase, public InputReceiver
+    class TuTouchBar : public TuBase, public InputReceiver
 	{
 	public:
 		explicit TuTouchBar(lv_obj_t *parent);
@@ -72,7 +74,7 @@ namespace UI
         lv_obj_t *m_circles[2] = {};
 	};
 
-	class TuApp : public TuComponentBase, public InputReceiver
+	class TuApp : public TuBase, public InputReceiver
 	{
 	public:
 		explicit TuApp(lv_obj_t *parent);
@@ -91,7 +93,7 @@ namespace UI
         Image     mImage;
 	};
 
-	class TuWater : public TuComponentBase, public InputReceiver
+	class TuWater : public TuBase, public InputReceiver
 	{
 	public:
 		explicit TuWater(lv_obj_t *parent);
@@ -107,7 +109,7 @@ namespace UI
         Image     mImage;
 	};
 
-	class TuWaterAssist : public TuComponentBase, public InputReceiver
+	class TuWaterAssist : public TuBase, public InputReceiver
 	{
 	public:
 		explicit TuWaterAssist(lv_obj_t *parent);
@@ -127,7 +129,7 @@ namespace UI
 	};
 
 
-    class TuPlantDetect : public TuComponentBase, public InputReceiver
+    class TuPlantDetect : public TuBase, public InputReceiver
 	{
 	public:
 		explicit TuPlantDetect(lv_obj_t *parent);
@@ -145,7 +147,7 @@ namespace UI
         bool plantExist = false;
 	};
 
-    class TuFinal : public TuComponentBase
+    class TuFinal : public TuBase
 	{
 	public:
 		explicit TuFinal(lv_obj_t *parent);
@@ -157,16 +159,28 @@ namespace UI
 		BasicText mMidText;
 	};
 
-	class UITutorial : public Base
+    class UITutorial : public Base, public StepBase
 	{
 	public:
 		explicit UITutorial(ObjPtr obj);
+    public:
+        enum TuIndex
+        {
+            Tu_Intro,
+            Tu_TouchBar,
+            Tu_App,
+            Tu_ProvTip,
+            Tu_Water,
+            Tu_WaterAssist,
+            Tu_PlantDetect,
+            Tu_Final,
+        };
 
         using ActionCB = std::function<void()>;
-        struct TutorialComponents
+        struct TutorialUnit
         {
-            std::shared_ptr<TuComponentBase> stepUI;
-            ActionCB action;
+            TuIndex index;
+            ActionCB startCB;
         };
 
 	public:
@@ -177,12 +191,16 @@ namespace UI
 
         bool _handleInput(InputEvtType &&input) override;
 
+        std::shared_ptr<TuBase> build(TuIndex index);
+
+        void tutorial_over();
+
 	private:
-        uint32_t mCurrent = 0;
+		std::vector<TuIndex> uiList{};
 
-		std::vector<TutorialComponents> uiList{};
+        std::shared_ptr<TuBase> mCurUI= nullptr;
 
-		bool tutorial_over = false;
+        uint32_t mCurIndex = 0;
 	};
 }
 void test();

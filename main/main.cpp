@@ -17,8 +17,6 @@
 #include "demos/lv_demos.h"
 #include "sdl/sdl.h"
 
-#include "UITutorial.h"
-
 /*********************
  *      DEFINES
  *********************/
@@ -64,6 +62,35 @@ static void hal_init(void);
  *   GLOBAL FUNCTIONS
  **********************/
 
+#include <memory>
+#include "log.h"
+#include "UITutorial.h"
+
+void sys_init()
+{
+    Theme::instance().initialize();
+}
+
+std::shared_ptr<UI::Base> ui_init()
+{
+    std::shared_ptr<UI::Base> ui = nullptr;
+
+    //region UI make
+    ui = std::make_shared<UI::UITutorial>(nullptr);
+    //endregion
+
+    if (ui && ui->load())
+    {
+        log_d("UI load success");
+    }
+    else
+    {
+        log_d("UI load failed");
+    }
+
+    return ui;
+}
+
 int main(int argc, char **argv)
 {
   (void)argc; /*Unused*/
@@ -75,29 +102,14 @@ int main(int argc, char **argv)
   /*Initialize the HAL (display, input devices, tick) for LVGL*/
   hal_init();
 
-//  lv_example_switch_1();
-//  lv_example_calendar_1();
-//  lv_example_btnmatrix_2();
-//  lv_example_checkbox_1();
-//  lv_example_colorwheel_1();
-//  lv_example_chart_6();
-//  lv_example_table_2();
-//  lv_example_scroll_2();
-//  lv_example_textarea_1();
-//  lv_example_msgbox_1();
-//  lv_example_dropdown_2();
-//  lv_example_btn_1();
-//  lv_example_scroll_1();
-//  lv_example_tabview_1();
-//  lv_example_tabview_1();
-//  lv_example_flex_3();
-//  lv_example_label_1();
+  sys_init();
 
-//    lv_demo_widgets();
-
-test();
+  auto UI = ui_init();
 
   while(1) {
+
+      UI->routine();
+
       /* Periodically call the lv_task handler.
        * It could be done in a timer interrupt or an OS task too.*/
       lv_timer_handler();
@@ -119,6 +131,8 @@ static void hal_init(void)
 {
   /* Use the 'monitor' driver which creates window on PC's monitor to simulate a display*/
   sdl_init();
+
+  SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
 
   /*Create a display buffer*/
   static lv_disp_draw_buf_t disp_buf1;

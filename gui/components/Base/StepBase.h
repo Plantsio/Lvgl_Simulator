@@ -18,7 +18,6 @@ namespace UI
     class StepBase
 	{
     public:
-        using HandlerCB = std::function<void()>;
 
         using ReadyCB = std::function<bool()>;
         using executeCB = std::function<bool()>;
@@ -32,14 +31,11 @@ namespace UI
         };
 
 	public:
-		 StepBase(HandlerCB start,HandlerCB end);
-         StepBase();
+         StepBase() = default;
 
 		 ~StepBase();
 
     public:
-        void stepHandler();
-
         void start();
 
         void stop();
@@ -47,6 +43,8 @@ namespace UI
         [[nodiscard]] bool finished() const;
 
     protected:
+        void stepHandler();
+
         bool enableAutoStep();
 
         void updateStepPeriod(uint32_t period);
@@ -57,17 +55,10 @@ namespace UI
         void registerStepCB(executeCB exe,
                             ReadyCB currentReady = [](){return true;},
                             ReadyCB nextReady = [](){return true;},
-                            ReadyCB prevReady = [](){return true;}
+                            ReadyCB prevReady = nullptr
                             );
 
-        void registerStartCB(HandlerCB start);
-
-        void registerStopCB(HandlerCB stop);
-
     private:
-        HandlerCB mStartCB;
-        HandlerCB mStopCB;
-
         bool mStarted = false;
         bool mFinished = false;
 

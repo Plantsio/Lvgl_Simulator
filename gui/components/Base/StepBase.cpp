@@ -7,14 +7,6 @@
 
 namespace UI
 {
-	StepBase::StepBase(HandlerCB start,HandlerCB end):
-	mStartCB(std::move(start)),
-    mStopCB(std::move(end))
-	{
-	}
-
-    StepBase::StepBase():mStartCB(nullptr),mStopCB(nullptr){}
-
 	StepBase::~StepBase()
 	{
 		log_d("deconstruct");
@@ -26,6 +18,9 @@ namespace UI
 
     void StepBase::stepHandler()
     {
+        if (!mTimer && !mStarted)
+            return;
+
         auto curReady = mStepList[mCurrentStep].currentReady;
         auto nextReady = mStepList[mCurrentStep].nextReady;
         auto prevReady= mStepList[mCurrentStep].prevReady;
@@ -33,35 +28,34 @@ namespace UI
 
         if (curReady && curReady())
         {
+            log_d("current");
             if (exe)
                 exe();
         }
 
         if (prevReady && prevReady())
         {
-            if (mCurrentStep >= 0)
-                mCurrentStep --;
-            else
+            log_d("prev");
+            mCurrentStep --;
+            if (mCurrentStep < 0)
                 stop();
         }
 
-        if (nextReady || nextReady())
+        if (nextReady && nextReady())
         {
-            if (mCurrentStep <= mStepList.size())
-                mCurrentStep ++;
-            else
+            log_d("next");
+            mCurrentStep ++;
+            if (mCurrentStep > mStepList.size() - 1)
                 stop();
         }
     }
 
 	void StepBase::start()
 	{
-        log_d("start ......");
 		if (mStarted)
 			return;
 
-        if (mStartCB)
-            mStartCB();
+        log_d("step start");
 
         if (mTimer)
             lv_timer_resume(mTimer);
@@ -72,16 +66,15 @@ namespace UI
 
 	void StepBase::stop()
 	{
-        log_d("ui end ...");
+        if (!mStarted)
+            return;
+        log_d("step stop");
 
         mStarted = false;
         mFinished = true;
 
         if (mTimer)
             lv_timer_pause(mTimer);
-
-        if (mStopCB)
-            mStopCB();
 
 	}
 
@@ -117,15 +110,5 @@ namespace UI
     void StepBase::registerStepCB(executeCB exe,ReadyCB currentReady,ReadyCB nextReady,ReadyCB prevReady)
     {
         mStepList.push_back({std::move(currentReady),std::move(nextReady),std::move(prevReady),std::move(exe)});
-    }
-
-    void StepBase::registerStartCB(HandlerCB start)
-    {
-        mStartCB = std::move(start);
-    }
-
-    void StepBase::registerStopCB(HandlerCB stop)
-    {
-        mStopCB = std::move(stop);
     }
 }

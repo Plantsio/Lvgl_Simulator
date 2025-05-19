@@ -30,6 +30,9 @@ void Theme::setFontSize(lv_obj_t *obj, int32_t size) {
     int closest = 0;
     int min_diff = 120;
 
+    if (m_font_map.empty())
+        return;
+
     for (auto item: m_font_map) {
         int diff = std::abs(size - item.first);
         if (diff < min_diff) {
@@ -216,7 +219,7 @@ void Theme::loadFont() {
         for (auto &size: fontSizeList) {
             m_font_map.insert(std::make_pair(size, getDefaultFont(size)));
         }
-        log_d("Theme: Failed to open dir,load default font");
+        log_d("Theme: Failed to open dir,load default font!");
     }
 }
 
