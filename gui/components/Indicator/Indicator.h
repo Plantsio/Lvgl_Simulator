@@ -22,6 +22,8 @@ namespace UI
 	public:
 		explicit Indicator(lv_obj_t *parent);
 
+        ~Indicator();
+
 	public:
 		void enable_visible(IndicatorPart part,bool anim_on = false,uint32_t duration = 0,uint32_t delay = 0);
 

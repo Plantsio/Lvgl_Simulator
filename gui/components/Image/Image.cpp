@@ -28,7 +28,8 @@ namespace UI
 	{
 		clear();
 
-		if (!load_image(path({ASSETS_DIR,name + ".mjpeg"})))
+        log_d("str == %s",ASSETS_DIR.c_str());
+		if (!load_image(ASSETS_DIR + name + ".mjpeg"))
 		{
 			log_e("Failed to load image");
 			return;

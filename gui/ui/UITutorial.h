@@ -23,6 +23,12 @@ namespace UI
         virtual void handleInput(InputEvtType &input) = 0;
 
     protected:
+        bool pressed(InputEvent target){
+            bool ret = mInputEvtType.index == target ? true : false;
+            mInputEvtType = {};
+            return ret;
+        };
+
         InputEvtType mInputEvtType{};
     };
 
@@ -142,6 +148,7 @@ namespace UI
     private:
         BasicText mTopText;
         Indicator mIndicator;
+        BasicText mBottomText;
         Image     mImage;
 
         bool plantExist = false;
@@ -195,11 +202,18 @@ namespace UI
 
         void tutorial_over();
 
+        void createProcessBase();
+
+        void createProcessUI(lv_obj_t *parent,uint32_t count);
+
 	private:
+        lv_obj_t *mProcessUnit;
+        lv_obj_t *mUIUnit;
+        lv_style_t mStyle{};
+
+
 		std::vector<TuIndex> uiList{};
-
         std::shared_ptr<TuBase> mCurUI= nullptr;
-
         uint32_t mCurIndex = 0;
 	};
 }

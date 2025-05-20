@@ -21,20 +21,20 @@ namespace UI
         if (!mTimer && !mStarted)
             return;
 
-        auto curReady = mStepList[mCurrentStep].currentReady;
         auto nextReady = mStepList[mCurrentStep].nextReady;
         auto prevReady= mStepList[mCurrentStep].prevReady;
-        auto exe = mStepList[mCurrentStep].execute;
+        auto execute = mStepList[mCurrentStep].execute;
 
-        bool success = false;
-        if (curReady && curReady())
+        int32_t original_repeat_count = mStepList[mCurrentStep].repeat_count;
+        if(mStepList[mCurrentStep].repeat_count > 0) mStepList[mCurrentStep].repeat_count--;
+
+        if (execute && original_repeat_count != 0)
         {
             log_d("current");
-            if (exe)
-                success = exe();
+            execute();
         }
 
-        if (prevReady && prevReady() && success)
+        if (prevReady && prevReady())
         {
             log_d("prev");
             mCurrentStep --;
@@ -42,7 +42,7 @@ namespace UI
                 stop();
         }
 
-        if (nextReady && nextReady() && success)
+        if (nextReady && nextReady())
         {
             log_d("next");
             mCurrentStep ++;
@@ -108,8 +108,8 @@ namespace UI
         TimerStep->stepHandler();
 	}
 
-    void StepBase::registerStepCB(executeCB exe,ReadyCB currentReady,ReadyCB nextReady,ReadyCB prevReady)
+    void StepBase::registerStepCB(executeCB exe,int32_t repeat_count,ReadyCB nextReady,ReadyCB prevReady)
     {
-        mStepList.push_back({std::move(currentReady),std::move(nextReady),std::move(prevReady),std::move(exe)});
+        mStepList.push_back({repeat_count,std::move(nextReady),std::move(prevReady),std::move(exe)});
     }
 }

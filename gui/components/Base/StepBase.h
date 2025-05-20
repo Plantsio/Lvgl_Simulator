@@ -11,6 +11,9 @@
 #include "BasicText.h"
 #include "Image.h"
 
+#define STEP_ONE_TIME             1
+#define STEP_INFINITY            -1
+
 #define COMMON_TIMER_DELAY      6000
 
 namespace UI
@@ -24,7 +27,7 @@ namespace UI
 
         struct StepUnit
         {
-            ReadyCB currentReady;
+            int32_t repeat_count;    /**< 1: One time;  -1 : infinity;  n>0: residual times*/
             ReadyCB nextReady;
             ReadyCB prevReady;
             executeCB execute;
@@ -53,7 +56,7 @@ namespace UI
 
     protected:
         void registerStepCB(executeCB exe,
-                            ReadyCB currentReady = [](){return true;},
+                            int32_t repeat_count = STEP_ONE_TIME,
                             ReadyCB nextReady = [](){return true;},
                             ReadyCB prevReady = nullptr
                             );
