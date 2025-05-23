@@ -550,6 +550,8 @@ namespace UI
 
         uiList = {Tu_Intro,Tu_TouchBar,Tu_App,Tu_Water,Tu_WaterAssist,Tu_PlantDetect,Tu_Final};
 
+        mIndev.attachIndev(mUIUnit,[&](InputEvtType &input){return _handleInput(std::forward<InputEvtType>(input));});
+
 	}
 
 	bool UITutorial::_initialize()

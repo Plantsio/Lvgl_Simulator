@@ -11,7 +11,7 @@ namespace UI {
     Base::Base(ObjPtr obj) :
             m_scr(lv_obj_create(nullptr)),
             m_obj(std::move(obj)) {
-        mIndev.attachIndev(m_scr,[&](InputEvtType &input){return _handleInput(std::forward<InputEvtType>(input));});
+        //mIndev.attachIndev(m_scr,[&](InputEvtType &input){return _handleInput(std::forward<InputEvtType>(input));});
     }
 
     Base::~Base() {
