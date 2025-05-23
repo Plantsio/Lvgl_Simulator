@@ -444,6 +444,92 @@ namespace UI
         return true;
     }
 
+    DotWidget::DotWidget(lv_obj_t *parent,lv_color_t base_color,const std::string &label_value):
+    group(lv_obj_create(parent))
+    {
+        lv_style_init(&dotStyle);
+        lv_style_set_radius(&dotStyle, LV_RADIUS_CIRCLE); // 设为圆形
+        lv_style_set_bg_color(&dotStyle, base_color); // 背景色
+        lv_style_set_bg_opa(&dotStyle, LV_OPA_COVER); // 不透明度
+        lv_style_set_border_width(&dotStyle, 0); // 无边框
+
+        lv_style_init(&groupStyle);
+        lv_style_set_border_width(&groupStyle,0);
+        lv_style_set_radius(&groupStyle,0);
+
+        lv_obj_set_size(group,40,18);
+        lv_obj_add_style(group,&groupStyle,0);
+        lv_obj_clear_flag(group, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_set_layout(group, LV_FLEX_FLOW_ROW);
+
+        dotMain = lv_obj_create(group);
+        lv_obj_set_size(dotMain, 13, 13); // 设置宽高相等
+        lv_obj_clear_flag(dotMain, LV_OBJ_FLAG_SCROLLABLE); // 禁用滚动
+
+        dotContent = lv_label_create(dotMain);
+        lv_label_set_text(dotContent, label_value.c_str()); // 设置数字
+        lv_obj_set_style_text_color(dotContent,lv_color_black(),0);
+        lv_obj_set_style_text_font(dotContent,&lv_font_montserrat_8,0);
+        lv_obj_set_style_text_align(dotContent,LV_TEXT_ALIGN_CENTER,0);
+        lv_obj_align(dotContent,LV_ALIGN_CENTER,-1,-1); // 居中显示
+
+        for (auto &dot : dotSub)
+        {
+            dot = lv_obj_create(group);
+            lv_obj_set_size(dot, 3, 3); // 设置宽高相等
+            lv_obj_clear_flag(dot, LV_OBJ_FLAG_SCROLLABLE); // 禁用滚动
+        }
+
+        lv_obj_add_style(dotMain, &dotStyle, 0);
+        for (auto &dot : dotSub)
+        {
+            lv_obj_add_style(dot, &dotStyle, 0);
+        }
+
+        lv_obj_align(dotMain, LV_ALIGN_LEFT_MID, -12, 0);
+        lv_obj_align_to(dotSub[0],dotMain,LV_ALIGN_OUT_RIGHT_MID,5,0);
+        lv_obj_align_to(dotSub[1],dotSub[0],LV_ALIGN_OUT_RIGHT_MID,5,0);
+        lv_obj_align_to(dotSub[2],dotSub[1],LV_ALIGN_OUT_RIGHT_MID,5,0);
+    }
+
+    DotWidget::~DotWidget()
+    {
+        lv_obj_del(dotMain);
+        for (auto &dot : dotSub)
+        {
+            lv_obj_del(dot);
+        }
+    }
+
+    void DotWidget::updateContent(const std::string &value)
+    {
+        lv_label_set_text(dotContent, value.c_str()); // 设置数字
+    }
+
+    void DotWidget::updateColor(lv_color_t value)
+    {
+        lv_obj_set_style_bg_color(dotMain,value,0);
+        for (auto &dot : dotSub)
+        {
+            lv_obj_set_style_bg_color(dot,value,0);
+        }
+    }
+
+    void DotWidget::align(lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
+    {
+        lv_obj_align(group,align,x_ofs,y_ofs);
+    }
+
+    void DotWidget::align_to(const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
+    {
+        lv_obj_align_to(group,base,align,x_ofs,y_ofs);
+    }
+
+    void DotWidget::align_to(const DotWidget &base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
+    {
+        lv_obj_align_to(group,base.group,align,x_ofs,y_ofs);
+    }
+
 	UITutorial::UITutorial(ObjPtr obj) :
 	Base(std::move(obj)),
     mProcessUnit(lv_obj_create(m_scr)),
@@ -462,13 +548,24 @@ namespace UI
         lv_obj_add_style(mUIUnit,&mStyle,0);
         lv_obj_clear_flag(mUIUnit, LV_OBJ_FLAG_SCROLLABLE);
 
-        createProcessBase();
-
         uiList = {Tu_Intro,Tu_TouchBar,Tu_App,Tu_Water,Tu_WaterAssist,Tu_PlantDetect,Tu_Final};
+
 	}
 
 	bool UITutorial::_initialize()
 	{
+        for (int i = 0;i < uiList.size();i ++)
+        {
+            mDots.push_back(std::make_unique<DotWidget>(mProcessUnit, lv_color_hex(0x969696),std::to_string(i + 1)));
+        }
+
+        mDots[0]->align(LV_ALIGN_LEFT_MID,-7,0);
+
+        for (int i = 1; i < mDots.size(); ++i)
+        {
+            mDots[i]->align_to(*mDots[i - 1],LV_ALIGN_OUT_RIGHT_MID,3,0);
+        }
+
         return true;
 	}
 
@@ -479,6 +576,7 @@ namespace UI
             mCurUI = build(uiList[mCurIndex]);
             mCurUI->initialize();
             mCurUI->start();
+            mDots[mCurIndex]->updateColor(lv_palette_main(LV_PALETTE_YELLOW));
             mCurIndex ++;
 
             if (mCurIndex >= uiList.size())
@@ -534,37 +632,6 @@ namespace UI
     {
         log_d("tutorial over");
         Sys::shutdown();
-    }
-
-    void UITutorial::createProcessBase()
-    {
-        lv_obj_t *dot = lv_obj_create(mProcessUnit);
-        lv_obj_set_size(dot, 15, 15); // 设置宽高相等
-        lv_obj_clear_flag(dot, LV_OBJ_FLAG_SCROLLABLE); // 禁用滚动
-
-// 设置圆点样式
-        static lv_style_t style;
-        lv_style_init(&style);
-        lv_style_set_radius(&style, LV_RADIUS_CIRCLE); // 设为圆形
-        lv_style_set_bg_color(&style, lv_color_hex(0x9C96B9)); // 背景色
-        lv_style_set_bg_opa(&style, LV_OPA_COVER); // 不透明度
-        lv_style_set_border_width(&style, 0); // 无边框
-        lv_obj_add_style(dot, &style, 0);
-
-// 添加数字标签
-        lv_obj_t *label = lv_label_create(dot);
-        lv_label_set_text(label, "5"); // 设置数字
-        lv_obj_set_style_text_color(label,lv_color_black(),0);
-        lv_obj_set_style_text_font(label,&lv_font_montserrat_10,0);
-        lv_obj_center(label); // 居中显示
-
-// 调整位置（可选）
-        lv_obj_align(dot, LV_ALIGN_LEFT_MID, 0, 0);
-    }
-
-    void UITutorial::createProcessUI(lv_obj_t *parent,uint32_t count)
-    {
-
     }
 }
 

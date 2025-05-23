@@ -3,17 +3,24 @@
 //
 
 #include "Indev.h"
+#include "log.h"
 
 void Indev::attachIndev(lv_obj_t *obj,MouseCB cb)
 {
+    log_d("111111111");
     lv_obj_add_event_cb(obj, mouse_cb, LV_EVENT_CLICKED, this);
     mCB = std::move(cb);
+    if (mCB)
+        log_d("cbcbcbcbcbcb");
+    log_d("22222222");
 }
 
 void Indev::mouse_cb(lv_event_t *event)
 {
+    log_d("1111111111");
     lv_indev_t *indev = lv_indev_get_act();
     lv_indev_type_t indev_type = lv_indev_get_type(indev);
+
     if (indev_type == LV_INDEV_TYPE_POINTER)
     {
         lv_point_t point;

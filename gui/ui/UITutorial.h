@@ -14,6 +14,7 @@
 #include "BasicText.h"
 #include "Image.h"
 #include "UIFluidAssist.h"
+#include "log.h"
 
 namespace UI
 {
@@ -166,6 +167,34 @@ namespace UI
 		BasicText mMidText;
 	};
 
+
+    class DotWidget
+    {
+    public:
+        explicit DotWidget(lv_obj_t *parent,lv_color_t base_color,const std::string &label_value = "");
+
+        ~DotWidget();
+
+    public:
+        void updateContent(const std::string &value);
+
+        void updateColor(lv_color_t value);
+
+        void align(lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
+
+        void align_to(const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
+
+        void align_to(const DotWidget &base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
+
+    private:
+        lv_obj_t *group;
+        lv_obj_t *dotMain = nullptr;
+        lv_obj_t *dotSub[3] = {nullptr};
+        lv_obj_t *dotContent = nullptr;
+        lv_style_t groupStyle{};
+        lv_style_t dotStyle{};
+    };
+
     class UITutorial : public Base, public StepBase
 	{
 	public:
@@ -202,19 +231,16 @@ namespace UI
 
         void tutorial_over();
 
-        void createProcessBase();
-
-        void createProcessUI(lv_obj_t *parent,uint32_t count);
-
 	private:
         lv_obj_t *mProcessUnit;
         lv_obj_t *mUIUnit;
         lv_style_t mStyle{};
 
-
 		std::vector<TuIndex> uiList{};
         std::shared_ptr<TuBase> mCurUI= nullptr;
         uint32_t mCurIndex = 0;
+
+        std::vector<std::unique_ptr<DotWidget>> mDots{};
 	};
 }
 void test();
