@@ -222,15 +222,15 @@ typedef struct jpeg_image_tag {
     void *pUser;
     uint8_t *pDitherBuffer; // provided externally to do Floyd-Steinberg dithering
     uint16_t *usPixels; // needs to be 16-byte aligned for S3 SIMD
-//    uint16_t usUnalignedPixels[MAX_BUFFERED_PIXELS+8];
-    uint16_t *usUnalignedPixels;
+    uint16_t usUnalignedPixels[MAX_BUFFERED_PIXELS+8];
+    //uint16_t *usUnalignedPixels;
     int16_t *sMCUs; // needs to be 16-byte aligned for S3 SIMD
-//    int16_t sUnalignedMCUs[8+(DCTSIZE * MAX_MCU_COUNT)]; // 4:2:0 needs 6 DCT blocks per MCU
-    int16_t *sUnalignedMCUs;     // PSRAM pointer (MCU coefficients)
+    int16_t sUnalignedMCUs[8+(DCTSIZE * MAX_MCU_COUNT)]; // 4:2:0 needs 6 DCT blocks per MCU
+    //int16_t *sUnalignedMCUs;     // PSRAM pointer (MCU coefficients)
     void *pFramebuffer;
     int16_t sQuantTable[DCTSIZE * 4]; // quantization tables
-//    uint8_t ucFileBuf[JPEG_FILE_BUF_SIZE]; // holds temp data and pixel stack
-    uint8_t *ucFileBuf; // holds temp data and pixel stack
+    uint8_t ucFileBuf[JPEG_FILE_BUF_SIZE]; // holds temp data and pixel stack
+//    uint8_t *ucFileBuf; // holds temp data and pixel stack
     uint8_t ucHuffDC[DC_TABLE_SIZE * 2]; // up to 2 'short' tables
     uint16_t usHuffAC[HUFF11SIZE * 2];
 } JPEGIMAGE;

@@ -29,7 +29,7 @@ namespace UI
 		clear();
 
         log_d("str == %s",ASSETS_DIR.c_str());
-		if (!load_image(ASSETS_DIR + name + ".mjpeg"))
+		if (!load_image(path({ASSETS_DIR, name + ".mjpeg"})))
 		{
 			log_e("Failed to load image");
 			return;
@@ -65,7 +65,7 @@ namespace UI
 	{
 		log_d("path = %s",path.c_str());
 
-        std::ifstream file(path);
+        std::ifstream file(path,std::ios::binary);
         if (!file.is_open())
         {
             log_e("Image: Failed to open file");
@@ -137,7 +137,6 @@ namespace UI
 		{
 			memcpy((m_draw_cache + m_frame_width * (i + draw->y) + draw->x),(draw->pPixels + draw->iWidth * i),draw->iWidth * sizeof(uint16_t));
 		}
-
 	}
 
 	std::string Image::get_assets_path(const std::string &name)

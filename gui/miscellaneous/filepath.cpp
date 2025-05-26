@@ -5,7 +5,7 @@
 #include <sstream>
 #include "log.h"
 
-const std::string MOUNT_NAME = ".";
+const std::string MOUNT_NAME = "..";
 const std::string STORE_DIR = "store";
 const std::string CONFIG_DIR = "config";
 const std::string DEBUG_DIR = "debug";
@@ -20,7 +20,6 @@ const std::string REPO_DIFF_FILENAME = "diff";
 std::string path(std::initializer_list<std::variant<std::string, const char*>> paths) {
     std::ostringstream ret;
     ret << MOUNT_NAME; // Assuming MOUNT_NAME is defined somewhere
-    log_d("mount name = %s",MOUNT_NAME.c_str());
     for (const auto &p : paths) {
         std::string pathStr;
         if (std::holds_alternative<std::string>(p)) {
@@ -31,11 +30,11 @@ std::string path(std::initializer_list<std::variant<std::string, const char*>> p
 
         // Remove "/sd" from the beginning of the path if it exists
         if (pathStr.find(MOUNT_NAME) == 0) {
-            pathStr.erase(0, MOUNT_NAME.length()); // Remove the first 3 characters ("/sd")
+            pathStr.erase(0, MOUNT_NAME.length() + 1); // Remove the first 3 characters ("/sd")
         }
 
         // Append the path to the result
-        ret << "/" << pathStr;
+        ret << "\\" << pathStr;
     }
     return ret.str();
 }

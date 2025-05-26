@@ -10,9 +10,9 @@
 #include "log.h"
 #include "filepath.h"
 
-#define LANGUAGE_FILE_PATH     "/theme/language/language.json"
-#define FONT_FILE_PATH         "/theme/font/"
-#define TEXT_FILE_PATH         "/theme/text/UIText.json"
+#define LANGUAGE_FILE_PATH     "theme/language/language.json"
+#define FONT_FILE_PATH         "../theme/font"
+#define TEXT_FILE_PATH         "theme/text/UIText.json"
 
 extern std::string defaultEnText;
 
@@ -121,7 +121,7 @@ bool Theme::_initialize() {
 bool Theme::loadLanguage() {
     try{
         nlohmann::json language_json;
-        if (loadJson(language_json, path({REPO_DIR, LANGUAGE_FILE_PATH}))) {
+        if (loadJson(language_json, path({REPO_DIR, "theme","language","language.json"}))) {
             m_current_language = language_json["current"].get<uint32_t>();
 
             log_d("current = %d", m_current_language);
@@ -145,15 +145,15 @@ bool Theme::loadLanguage() {
 
 void Theme::saveLanguage(uint32_t language) {
     nlohmann::json language_json;
-    loadJson(language_json, path({REPO_DIR, LANGUAGE_FILE_PATH}));
+    loadJson(language_json, path({REPO_DIR, "theme","language","language.json"}));
     language_json["current"] = language;
-    saveJson(language_json, path({REPO_DIR, LANGUAGE_FILE_PATH}));
+    saveJson(language_json, path({REPO_DIR, "theme","language","language.json"}));
 }
 
 bool Theme::loadText() {
     try{
         nlohmann::json text_json;
-        if (loadJson(text_json, path({REPO_DIR, TEXT_FILE_PATH}))) {
+        if (loadJson(text_json, path({REPO_DIR, "theme","text","UIText.json"}))) {
             for (const auto &it: text_json.items()) {
                 nlohmann::json js_text = it.value();
                 if (m_support_language_list.empty())
@@ -187,9 +187,9 @@ void Theme::loadFont() {
     std::string font_dir;
 
     if (m_support_language_list.empty()) {
-        font_dir = path({REPO_DIR, FONT_FILE_PATH, "en"});
+        font_dir = path({REPO_DIR, "theme", "font","en"});
     } else {
-        font_dir = path({REPO_DIR, FONT_FILE_PATH, m_support_language_list.at(m_current_language)});
+        font_dir = path({REPO_DIR, "theme","font", m_support_language_list.at(m_current_language)});
     }
 
     std::string font_path = font_dir;
@@ -207,7 +207,7 @@ void Theme::loadFont() {
 
             int32_t front_size = getFontSize(font_name);
 
-            auto font_full_path = std::string("S:/")+ font_dir.substr(MOUNT_NAME.length()) + "/" + font_name;
+            auto font_full_path = std::string("S:")+ font_dir + "\\" + font_name;
 
             lv_font_t *font = lv_font_load(font_full_path.c_str());
             m_font_map.insert(std::make_pair(front_size, font));
