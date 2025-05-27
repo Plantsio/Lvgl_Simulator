@@ -7,6 +7,7 @@
 
 #include <cstdio>
 #include <variant>
+#include <memory>
 
 #include "lvgl.h"
 
@@ -137,5 +138,29 @@ namespace Sys
 {
     void shutdown();
 }
+
+enum NetStatus
+{
+    IOT_NOT_CONNECTED,
+    IOT_CONNECTED,
+    IOT_ACTIVATED,
+    IOT_ONLINE,
+    IOT_DISCONNECTED,
+    IOT_OFFLINE,
+};
+
+class IOTManager
+{
+public:
+    //region Singleton
+    static IOTManager &instance()
+    {
+        static std::shared_ptr<IOTManager> instance(new IOTManager());
+        return *instance;
+    }
+
+    NetStatus getNetStatus(){return IOT_ONLINE;}
+};
+
 
 #endif //SIMULATOR_INTERFACE_H

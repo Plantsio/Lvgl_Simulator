@@ -8,23 +8,41 @@
 #include <functional>
 
 #include "UIBase.h"
+#include "StepBase.h"
 #include "Progress.h"
 
 
-
 namespace UI {
-    class UIBoot : public Base
+    class UIBoot : public Base, public StepBase
     {
     public:
         explicit UIBoot(ObjPtr obj);
+
+    public:
+        using ConditionCb = std::function<bool()>;
+        using HandleCb = std::function<void()>;
+
+        enum BootStep
+        {
+            boot_connecting,
+            boot_activating,
+            boot_tuning_time,
+            boot_locating,
+            boot_physical_check,
+            boot_plant_detect,
+            boot_step_num,
+        };
+
+        //using ConditionCb = std::function<bool()>;
 
     public:
         static void set(const std::string &desc, int progress);
 
         void update_now(const std::string &desc, int progress);
 
-        bool check_routine(const std::function<bool()> &check_cb, int progress, int timeout, const std::string &success_desc,
-						   const std::string &fail_desc);
+        bool check_routine(const ConditionCb &condition, int progress, int timeout,
+                           const HandleCb &success_handler,
+						   const HandleCb &fail_handler);
 
         static int get_current_progress();
 
@@ -34,19 +52,13 @@ namespace UI {
 
         static void set_current_desc(const std::string &desc);
 
-        static void timer_cb(lv_timer_t *timer);
-
-        void next();
 
     private:
         void refresh_timeout();
 
         bool _initialize() override;
 
-        bool _deInitialize() override;
-
     private:
-        lv_timer_t *m_timer = nullptr;
         int m_current_step = 0;
         uint32_t m_current_start_t = 0;
 

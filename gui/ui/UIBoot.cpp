@@ -47,27 +47,52 @@ namespace UI
     bool UIBoot::_initialize()
     {
         mProcess.update_title(THEME_TEXT_CONTENT(Lang::ui_boot_waking_up));
-        m_timer = lv_timer_create(timer_cb, 100, this);
-        lv_timer_ready(m_timer);
+
+        registerStepCB([&](){
+            update_now(THEME_TEXT_CONTENT(Lang::ui_boot_connect_to_net), 5);
+            check_routine([]() { return true; }, 10, 7000,
+                          THEME_TEXT_CONTENT(Lang::ui_boot_connect_succ),
+                          THEME_TEXT_CONTENT(Lang::ui_boot_connect_fail));
+            return true;
+        });
+
+        registerStepCB([&](){
+            update_now(THEME_TEXT_CONTENT(Lang::ui_boot_activating), 15);
+            check_routine([]() { return true; }, 20, 10000,
+                          THEME_TEXT_CONTENT(Lang::ui_boot_activated),
+                          THEME_TEXT_CONTENT(Lang::ui_boot_activate_fail));
+            return true;
+        });
+
+        registerStepCB([&](){
+            update_now(THEME_TEXT_CONTENT(Lang::ui_boot_tuning_time), 25);
+            check_routine([]() { return true; }, 30, 5000,
+                          THEME_TEXT_CONTENT(Lang::ui_boot_tune_succ),
+                          THEME_TEXT_CONTENT(Lang::ui_boot_tune_fail));
+            return true;
+        });
+
+        registerStepCB([&](){
+            refresh_timeout();
+            update_now(THEME_TEXT_CONTENT(Lang::ui_boot_locating), 35);
+            check_routine([]() { return true; }, 40, 10000,
+                          THEME_TEXT_CONTENT(Lang::ui_boot_locate_succ),
+                          THEME_TEXT_CONTENT(Lang::ui_boot_locate_fail));
+
+            return true;
+        });
+
+        registerStepCB([&](){
+            update_now(THEME_TEXT_CONTENT(Lang::ui_boot_physical_check), 45);
+            check_routine([]() { return true; }, 50, 5000,
+                          THEME_TEXT_CONTENT(Lang::ui_boot_physical_succ),
+                          THEME_TEXT_CONTENT(Lang::ui_boot_physical_fail));
+            return true;
+        });
+
 
         //IvyBody::instance().unregister_button_tap();
         return true;
-    }
-
-    bool UIBoot::_deInitialize()
-    {
-        //Sys::set_condition(Sys::BOOT_OVER);
-        if (m_timer)
-        {
-            lv_timer_del(m_timer);
-        }
-        return true;
-    }
-
-    void UIBoot::timer_cb(lv_timer_t *timer)
-    {
-        auto ui = static_cast<UIBoot *>(timer->user_data);
-        ui->next();
     }
 
     void UIBoot::update_now(const std::string &desc, int progress)
@@ -76,14 +101,15 @@ namespace UI
         mProcess.update_progress(progress);
     }
 
-    bool UIBoot::check_routine(const std::function<bool()> &check_cb, int progress, int timeout,
-                               const std::string &success_desc, const std::string &fail_desc)
+    bool UIBoot::check_routine(const ConditionCb &condition, int progress, int timeout,
+                  const HandleCb &success_handler,
+                  const HandleCb &fail_handler)
     {
-        if (check_cb())
+        if (condition())
         {
             update_now(success_desc, progress);
             log_v("debug-boot %s", success_desc.c_str());
-            lv_timer_set_period(m_timer, 500);
+            updateStepPeriod( 500);
             return true;
         }
         else
@@ -93,7 +119,7 @@ namespace UI
                 update_now(Theme::getPaletteText(fail_desc, Theme::palette_warning), progress);
                 over_time = true;
                 log_v("debug-boot %s", fail_desc.c_str());
-                lv_timer_set_period(m_timer, 800);
+                updateStepPeriod( 800);
                 return false;
             }
         }
@@ -103,11 +129,17 @@ namespace UI
     void UIBoot::refresh_timeout()
     {
         m_current_start_t = SysTime::millis();
-        lv_timer_set_period(m_timer, 100);
+        updateStepPeriod( 100);
     }
 
     void UIBoot::next()
     {
+        /*
+         * 1.check routine   true success, false fail
+         * 2.timeout
+         * 3.允许step跳转
+         * */
+
         switch (m_current_step)
         {
             case 0:
