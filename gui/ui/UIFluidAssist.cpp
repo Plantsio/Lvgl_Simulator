@@ -25,12 +25,12 @@ namespace UI {
         lv_obj_add_flag(m_bar_label, LV_OBJ_FLAG_HIDDEN);
 		THEME_SET_FONT_SIZE(m_middle_label,30);
 
-        lv_coord_t x = (LV_HOR_RES - m_tank_size) / 2 - 10;
+        lv_value_precise_t x = (LV_HOR_RES - m_tank_size) / 2 - 10;
         m_assist_start_y = (LV_VER_RES - m_tank_size) / 2;
-        m_bar_points[0] = {.x=x, .y=(lv_coord_t) (m_assist_start_y + 8)};
-        m_bar_points[1] = {.x=x, .y=(lv_coord_t) (m_assist_top + m_assist_start_y)};
-        m_bar_points[2] = {.x=x, .y=(lv_coord_t) (m_assist_bottom + m_assist_start_y)};
-        m_bar_points[3] = {.x=x, .y=(lv_coord_t) (m_tank_size - 8 + m_assist_start_y)};
+        m_bar_points[0] = {.x=x, .y=m_assist_start_y + 8};
+        m_bar_points[1] = {.x=x, .y=m_assist_top + m_assist_start_y};
+        m_bar_points[2] = {.x=x, .y=m_assist_bottom + m_assist_start_y};
+        m_bar_points[3] = {.x=x, .y=m_tank_size - 8 + m_assist_start_y};
     }
 
     bool UIFluidAssist::_initialize() {

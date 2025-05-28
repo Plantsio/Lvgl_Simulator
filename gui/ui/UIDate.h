@@ -32,7 +32,7 @@ namespace UI {
         lv_obj_t *mask;
         lv_obj_t *init_label;
         lv_obj_t *line;
-		lv_point_t line_points[2] = {{0,   0},
+        lv_point_precise_t line_points[2] = {{0,   0},
                                      {260, 0}};
         lv_timer_t *timer = nullptr;
     };

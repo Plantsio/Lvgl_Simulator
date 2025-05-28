@@ -222,8 +222,8 @@ typedef struct jpeg_image_tag {
     void *pUser;
     uint8_t *pDitherBuffer; // provided externally to do Floyd-Steinberg dithering
     uint16_t *usPixels; // needs to be 16-byte aligned for S3 SIMD
-    uint16_t usUnalignedPixels[MAX_BUFFERED_PIXELS+8];
-    //uint16_t *usUnalignedPixels;
+    //uint16_t usUnalignedPixels[MAX_BUFFERED_PIXELS+8];
+    uint16_t *usUnalignedPixels;
     int16_t *sMCUs; // needs to be 16-byte aligned for S3 SIMD
     int16_t sUnalignedMCUs[8+(DCTSIZE * MAX_MCU_COUNT)]; // 4:2:0 needs 6 DCT blocks per MCU
     //int16_t *sUnalignedMCUs;     // PSRAM pointer (MCU coefficients)

@@ -74,7 +74,7 @@ namespace UI {
         if (indev_type == LV_INDEV_TYPE_POINTER) {
             lv_point_t point;
             lv_indev_get_point(indev, &point);
-            auto *ui = (UIFluid *) event->user_data;
+            auto *ui = static_cast<UIFluid *>(lv_event_get_user_data(event));
             int start = (LV_VER_RES - ui->get_tank_size()) / 2;
             int end = start + ui->get_tank_size();
             int y = std::min((int) point.y, end) - start;
@@ -99,7 +99,7 @@ namespace UI {
 	{
 		m_top_text.set_font_size(16);
 		m_canvas_buf.resize(m_tank_size * m_tank_size * sizeof(uint16_t));
-		lv_canvas_set_buffer(m_canvas, m_canvas_buf.data(), m_tank_size, m_tank_size, LV_IMG_CF_TRUE_COLOR);
+		lv_canvas_set_buffer(m_canvas, m_canvas_buf.data(), m_tank_size, m_tank_size, LV_COLOR_FORMAT_NATIVE);
 		lv_obj_align(m_canvas, LV_ALIGN_CENTER, 0, 0);
 		lv_canvas_fill_bg(m_canvas, WATER_TANK_ENV_COLOR, LV_OPA_COVER);
         label_set_style(m_bottom_label, &ba_30);

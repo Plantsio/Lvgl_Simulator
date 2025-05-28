@@ -209,7 +209,7 @@ void Theme::loadFont() {
 
             auto font_full_path = std::string("S:")+ font_dir + "\\" + font_name;
 
-            lv_font_t *font = lv_font_load(font_full_path.c_str());
+            lv_font_t *font = lv_binfont_create(font_full_path.c_str());
             m_font_map.insert(std::make_pair(front_size, font));
         }
         closedir(dir);

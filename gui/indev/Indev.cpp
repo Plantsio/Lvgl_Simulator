@@ -20,7 +20,7 @@ void Indev::mouse_cb(lv_event_t *event)
     {
         lv_point_t point;
         lv_indev_get_point(indev, &point);
-        auto input_cb = static_cast<Indev *>(event->user_data)->mCB;
+        auto input_cb = static_cast<Indev *>(lv_event_get_user_data(event))->mCB;
         if (!input_cb)
             return;
 

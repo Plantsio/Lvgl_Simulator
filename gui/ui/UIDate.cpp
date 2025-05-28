@@ -29,7 +29,7 @@ namespace UI {
 
     static void anim_calender(struct _lv_timer_t *t) {
         for (int i = 0; i < 7; i++) {
-            lv_btnmatrix_clear_btn_ctrl((lv_obj_t *) t->user_data, btn_index++, LV_BTNMATRIX_CTRL_HIDDEN);
+            lv_btnmatrix_clear_btn_ctrl((lv_obj_t *) lv_timer_get_user_data(t), btn_index++, LV_BTNMATRIX_CTRL_HIDDEN);
         }
     }
 

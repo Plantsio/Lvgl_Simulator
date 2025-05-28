@@ -105,7 +105,7 @@ namespace UI
 
 	void StepBase::timer_cb(lv_timer_t *timer)
 	{
-		auto TimerStep = static_cast<StepBase *>(timer->user_data);
+		auto TimerStep = static_cast<StepBase *>(lv_timer_get_user_data(timer));
 
         TimerStep->stepHandler();
 	}

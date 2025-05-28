@@ -19,7 +19,7 @@ namespace UI {
         THEME_SET_FONT_SIZE(m_step_label, 30);
         THEME_SET_FONT_SIZE(m_value_label, 40);
         THEME_SET_FONT_SIZE(m_desc_label, 16);
-        lv_label_set_recolor(m_desc_label, true);
+        //lv_label_set_recolor(m_desc_label, true);
 
         bar_set_default_style(m_progress_bar);
         lv_obj_set_size(m_progress_bar, 200, 20);
@@ -47,16 +47,13 @@ namespace UI {
         if (anim_t) {
             lv_obj_set_style_anim_time(m_progress_bar, anim_t, 0);
             lv_bar_set_value(m_progress_bar, progress, LV_ANIM_ON);
-            auto *bar = (lv_bar_t *) m_progress_bar;
-            bar->cur_value_anim.anim_start = 0;
         } else {
             lv_bar_set_value(m_progress_bar, progress, LV_ANIM_OFF);
         }
     }
 
     void UITest::reset_progress() {
-        auto *bar = (lv_bar_t *) m_progress_bar;
-        bar->cur_value = 0;
+        lv_bar_set_value(m_progress_bar, 0, LV_ANIM_OFF);
     }
 
     void UITest::update_color(lv_color_t back_color, lv_color_t text_color) {

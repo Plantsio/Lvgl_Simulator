@@ -13,10 +13,10 @@ namespace UI
     mFadeOutTime(fade_out_t)
 	{
 		lv_obj_set_width(mBaseLabel,width);
-		lv_label_set_recolor(mBaseLabel, true);
+		//lv_label_set_recolor(mBaseLabel, true);
 		lv_label_set_text(mBaseLabel, "");
 		lv_obj_set_style_text_color(mBaseLabel,lv_color_white(),0);
-		lv_obj_set_style_text_align(mBaseLabel,LV_FLEX_ALIGN_CENTER,0);
+		lv_obj_set_style_text_align(mBaseLabel,LV_TEXT_ALIGN_CENTER,0);
 	}
 
 	BasicText::~BasicText()

@@ -31,7 +31,7 @@ namespace UI
 
         m_status_label_1 = lv_label_create(_parent);
         lv_obj_set_width(m_status_label_1, 300);
-        lv_label_set_recolor(m_status_label_1,true);
+        //lv_label_set_recolor(m_status_label_1,true);
 		THEME_SET_FONT_SIZE(m_status_label_1,16);
         lv_obj_align_to(m_status_label_1, m_bar_1, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
 
@@ -42,7 +42,7 @@ namespace UI
         m_desc_label = lv_label_create(_parent);
         lv_obj_set_width(m_desc_label, 280);
 		THEME_SET_FONT_SIZE(m_desc_label,16);
-        lv_label_set_recolor(m_desc_label, true);
+        //lv_label_set_recolor(m_desc_label, true);
         lv_obj_align_to(m_desc_label, m_status_label_2, LV_ALIGN_OUT_BOTTOM_MID, 0, 12);
     }
 

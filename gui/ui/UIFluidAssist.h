@@ -35,11 +35,11 @@ namespace UI {
         lv_obj_t *m_bar_top;
         lv_obj_t *m_bar_bottom;
         lv_obj_t *m_bar_middle;
-		lv_point_t m_bar_points[4]{};
+        lv_point_precise_t m_bar_points[4]{};
 
-        lv_coord_t m_assist_top = 0;
-        lv_coord_t m_assist_bottom = 0;
-        lv_coord_t m_assist_start_y = 0;
+        lv_value_precise_t m_assist_top = 0;
+        lv_value_precise_t m_assist_bottom = 0;
+        lv_value_precise_t m_assist_start_y = 0;
 
     };
 }

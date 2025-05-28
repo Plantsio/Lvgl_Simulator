@@ -41,7 +41,7 @@ namespace UI
 			return;
 		}
 
-		m_img_desc.header.cf = LV_IMG_CF_TRUE_COLOR;
+		m_img_desc.header.cf = LV_COLOR_FORMAT_NATIVE;
 		m_img_desc.header.h  = m_mjpeg_dec.getHeight();
 		m_img_desc.header.w  = m_mjpeg_dec.getWidth();
 		m_img_desc.data      = (uint8_t *)m_draw_cache;

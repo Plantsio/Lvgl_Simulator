@@ -178,7 +178,7 @@ namespace UI
 
     void UITomatoClock::timer_wrapper(lv_timer_t *timer)
     {
-        auto instance = static_cast<UITomatoClock *>(timer->user_data);
+        auto instance = static_cast<UITomatoClock *>(lv_timer_get_user_data(timer));
 
         instance->timer_cb();
     }
