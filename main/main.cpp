@@ -61,7 +61,9 @@ static lv_display_t * hal_init(int32_t w, int32_t h);
 
 #include <memory>
 #include "log.h"
+
 #include "UITutorial.h"
+#include "FontTTF.h"
 
 void sys_init()
 {
@@ -73,7 +75,8 @@ std::shared_ptr<UI::Base> ui_init()
     std::shared_ptr<UI::Base> ui = nullptr;
 
     //region UI make
-    ui = std::make_shared<UI::UITutorial>(nullptr);
+    //ui = std::make_shared<UI::UITutorial>(nullptr);
+    ui = std::make_shared<UI::FontTTF>();
     //endregion
 
     if (ui && ui->load())
@@ -147,6 +150,8 @@ static lv_display_t * hal_init(int32_t w, int32_t h)
     lv_group_set_default(lv_group_create());
 
     lv_display_t * disp = lv_sdl_window_create(w, h);
+
+    SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_DEBUG);
 
     lv_indev_t * mouse = lv_sdl_mouse_create();
     lv_indev_set_group(mouse, lv_group_get_default());
