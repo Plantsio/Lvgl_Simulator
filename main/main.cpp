@@ -64,6 +64,7 @@ static lv_display_t * hal_init(int32_t w, int32_t h);
 
 #include "UITutorial.h"
 #include "FontTTF.h"
+#include "Lottie.h"
 
 void sys_init()
 {
@@ -76,7 +77,8 @@ std::shared_ptr<UI::Base> ui_init()
 
     //region UI make
     //ui = std::make_shared<UI::UITutorial>(nullptr);
-    ui = std::make_shared<UI::FontTTF>();
+    //ui = std::make_shared<UI::FontTTF>();
+    ui = std::make_shared<UI::Lottie>();
     //endregion
 
     if (ui && ui->load())

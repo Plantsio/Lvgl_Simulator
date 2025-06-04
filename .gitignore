@@ -16,3 +16,4 @@ cmake-build-*/
 cmake-build-*
 .vs/
 *.ini
+resources/
