@@ -1,1 +1,4 @@
 
+[submodule "simulator"]
+	path = simulator
+	url = git@github.com:Plantsio/lv_port_pc_eclipse.git
