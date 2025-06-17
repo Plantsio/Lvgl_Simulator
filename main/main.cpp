@@ -65,6 +65,8 @@ static lv_display_t * hal_init(int32_t w, int32_t h);
 #include "UITutorial.h"
 #include "FontTTF.h"
 #include "Lottie.h"
+#include "RuntimeFont.h"
+#include "lv_font_runtime.h"
 
 void sys_init()
 {
@@ -78,7 +80,8 @@ std::shared_ptr<UI::Base> ui_init()
     //region UI make
     //ui = std::make_shared<UI::UITutorial>(nullptr);
     //ui = std::make_shared<UI::FontTTF>();
-    ui = std::make_shared<UI::Lottie>();
+    //ui = std::make_shared<UI::Lottie>();
+    ui = std::make_shared<UI::RuntimeFont>();
     //endregion
 
     if (ui && ui->load())
@@ -91,6 +94,13 @@ std::shared_ptr<UI::Base> ui_init()
     }
 
     return ui;
+}
+
+void font_test()
+{
+    write_bin();
+
+    //lv_bin_runtime_create("S:..\\resources\\ba_16.cbin");
 }
 
 int main(int argc, char **argv)
@@ -118,9 +128,11 @@ int main(int argc, char **argv)
 //      }
 //  }
 
-  sys_init();
+  //sys_init();
 
   auto UI = ui_init();
+
+//    font_test();
 
   while(1) {
 
