@@ -4,133 +4,14 @@
 
 #include "lv_font_runtime.h"
 #include "stdlib/lv_string.h"
-#include "log.h"
+#include "lv_bin_defines.h"
 
-typedef struct font_header_bin {
-    uint16_t tables_count;
-    uint16_t ascent;
-    int16_t descent;
-    uint16_t kerning_scale;
-    uint8_t bits_per_pixel;
-    uint8_t compression_id;
-    uint8_t subpixels_mode;
-    uint8_t glyph_id_format;
-    int16_t underline_position;
-    uint16_t underline_thickness;
-} font_header_bin_t;
-
-typedef struct cmap_table_bin {
-    uint32_t data_offset;
-    uint32_t range_start;
-    uint16_t range_length;
-    uint16_t glyph_id_start;
-    uint16_t data_entries_count;
-    uint8_t format_type;
-    uint8_t padding;
-} cmap_table_bin_t;
-
-
-typedef struct {
-    uint32_t gid_left;
-    uint32_t gid_right;
-} kern_pair_ref_t;
 
 typedef struct {
     lv_fs_file_t *fp;
     uint32_t glyph_dsc_offset;
     uint32_t glyph_bitmap_offset;
 }glyph_info;
-
-void write_bin()
-{
-    lv_fs_file_t file,*fp;
-    fp = &file;
-    lv_fs_res_t fs_res = lv_fs_open(fp, "S:..\\resources\\cbin_16.cbin", LV_FS_MODE_WR);
-    if(fs_res != LV_FS_RES_OK) return;
-
-    const lv_font_t *font = &cbin_16;
-    lv_font_fmt_txt_dsc_t *fdsc = (lv_font_fmt_txt_dsc_t *) font->dsc;
-
-    /*write header*/
-    font_header_bin_t header_bin = {0};
-    uint32_t header_length = sizeof(font_header_bin_t) + sizeof(uint32_t);
-
-    header_bin.tables_count = 5;
-    header_bin.descent = (int16_t)(-font->base_line);
-    header_bin.ascent = header_bin.descent + font->line_height;
-    header_bin.kerning_scale = fdsc->kern_scale;
-    header_bin.bits_per_pixel = fdsc->bpp;
-    header_bin.compression_id = fdsc->bitmap_format;
-    header_bin.subpixels_mode = font->subpx;
-    header_bin.underline_position = (int16_t)font->underline_position;
-    header_bin.underline_thickness = (int16_t)font->underline_thickness;
-
-    lv_fs_write(fp,&header_length, sizeof(uint32_t),NULL);
-    lv_fs_write(fp,&header_bin, sizeof(font_header_bin_t),NULL);
-
-    /*write cmap*/
-    uint32_t cmap_num = fdsc->cmap_num;
-    cmap_table_bin_t cmap_bin[fdsc->cmap_num];
-    lv_memset(&cmap_bin, 0,sizeof(cmap_table_bin_t) * cmap_num);
-
-    const lv_font_fmt_txt_cmap_t * cmaps = fdsc->cmaps;
-
-    for (int i = 0; i < cmap_num;i ++)
-    {
-        cmap_bin[i].range_start = cmaps[i].range_start;
-        cmap_bin[i].range_length = cmaps[i].range_length;
-        cmap_bin[i].glyph_id_start = cmaps[i].glyph_id_start;
-        cmap_bin[i].format_type = cmaps[i].type;
-    }
-
-    uint32_t cmap_length = sizeof(cmap_table_bin_t) * cmap_num + sizeof(uint32_t) * 2;
-    lv_fs_write(fp,&cmap_length, sizeof(uint32_t),NULL);
-    lv_fs_write(fp,&cmap_num, sizeof(uint32_t),NULL);
-    lv_fs_write(fp,cmap_bin, sizeof(cmap_table_bin_t) * cmap_num,NULL);
-
-    /*write kern*/
-    lv_font_fmt_txt_kern_classes_t *kern = (lv_font_fmt_txt_kern_classes_t *)fdsc->kern_dsc;
-
-    uint8_t kern_format_type = 3;
-    int32_t padding = 0;
-
-    uint16_t kern_class_mapping_length = 97;
-    uint8_t kern_table_rows = kern->left_class_cnt;
-    uint8_t kern_table_cols = kern->right_class_cnt;
-
-    uint32_t kern_length = kern_class_mapping_length * 2 + kern_table_rows * kern_table_cols + sizeof(int32_t) * 3;
-
-    lv_fs_write(fp,&kern_length, sizeof(uint32_t),NULL);
-
-    lv_fs_write(fp,&kern_format_type, sizeof(uint8_t),NULL);
-    lv_fs_write(fp,&padding,sizeof(uint8_t) * 3,NULL);
-
-    lv_fs_write(fp,&kern_class_mapping_length,sizeof(uint16_t),NULL);
-    lv_fs_write(fp,&kern_table_rows,sizeof(uint8_t),NULL);
-    lv_fs_write(fp,&kern_table_cols,sizeof(uint8_t),NULL);
-
-    lv_fs_write(fp,kern->left_class_mapping,kern_class_mapping_length,NULL);
-    lv_fs_write(fp,kern->right_class_mapping,kern_class_mapping_length,NULL);
-    lv_fs_write(fp,kern->class_pair_values,kern_table_rows * kern_table_cols * sizeof(int8_t),NULL);
-
-    /*write glyph desc*/
-    uint32_t glyph_dsc_num = 97;
-    uint32_t glyph_dsc_length = sizeof(lv_font_fmt_txt_glyph_dsc_t) * glyph_dsc_num + sizeof(uint32_t);
-    lv_font_fmt_txt_glyph_dsc_t *gdsc = (lv_font_fmt_txt_glyph_dsc_t *)fdsc->glyph_dsc;
-
-    lv_fs_write(fp,&glyph_dsc_length, sizeof(uint32_t),NULL);
-    lv_fs_write(fp,gdsc, sizeof(lv_font_fmt_txt_glyph_dsc_t) * glyph_dsc_num,NULL);
-
-    /*write glyph bitmap*/
-    uint32_t glyph_bitmap_length = 3542;
-    const uint8_t *bitmap = fdsc->glyph_bitmap;
-
-    lv_fs_write(fp,&glyph_bitmap_length, sizeof(uint32_t),NULL);
-    lv_fs_write(fp,bitmap, glyph_bitmap_length,NULL);
-
-    lv_fs_close(fp);
-
-}
 
 static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font);
 
@@ -376,6 +257,7 @@ static int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, ui
         kern_pair->values = values;
 
         if(lv_fs_read(fp, glyph_ids, ids_size, NULL) != LV_FS_RES_OK) {
+
             return -1;
         }
 

@@ -14,8 +14,6 @@ lv_font_t *lv_bin_runtime_create(const char* path);
 
 void lv_bin_runtime_destroy(lv_font_t *font);
 
-void write_bin();
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
