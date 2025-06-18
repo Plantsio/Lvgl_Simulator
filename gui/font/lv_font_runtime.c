@@ -14,6 +14,14 @@ typedef struct {
 }glyph_info;
 
 static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font);
+static int32_t read_label_length(lv_fs_file_t * fp, uint32_t start);
+static int32_t load_cmaps(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint32_t cmaps_start);
+static int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, uint8_t format, uint32_t start);
+static bool lv_font_runtime_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
+                                   uint32_t unicode_letter_next);
+
+const void *lv_font_runtime_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_draw_buf_t * draw_buf);
+
 
 lv_font_t *lv_bin_runtime_create(const char* path)
 {
@@ -41,10 +49,120 @@ lv_font_t *lv_bin_runtime_create(const char* path)
 
     return font;
 }
-
 void lv_bin_runtime_destroy(lv_font_t *font)
 {
+    if (font == NULL) return;
 
+    const lv_font_fmt_txt_dsc_t *fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
+    if (fdsc == NULL) return;
+
+    const lv_font_fmt_txt_cmap_t * cmaps = fdsc->cmaps;
+    if(NULL != cmaps) {
+        for(int i = 0; i < fdsc->cmap_num; ++i) {
+            lv_free((void *)cmaps[i].glyph_id_ofs_list);
+            lv_free((void *)cmaps[i].unicode_list);
+        }
+        lv_free((void *)cmaps);
+    }
+
+    if(fdsc->kern_classes == 0) {
+        const lv_font_fmt_txt_kern_pair_t * kern_dsc = fdsc->kern_dsc;
+        if(NULL != kern_dsc) {
+            lv_free((void *)kern_dsc->glyph_ids);
+            lv_free((void *)kern_dsc->values);
+            lv_free((void *)kern_dsc);
+        }
+    }
+    else {
+        const lv_font_fmt_txt_kern_classes_t * kern_dsc = fdsc->kern_dsc;
+        if(NULL != kern_dsc) {
+            lv_free((void *)kern_dsc->class_pair_values);
+            lv_free((void *)kern_dsc->left_class_mapping);
+            lv_free((void *)kern_dsc->right_class_mapping);
+            lv_free((void *)kern_dsc);
+        }
+    }
+
+    lv_free((void *)fdsc);
+    lv_free(font->user_data);
+    lv_free(font);
+}
+
+/*
+ * Loads a `lv_font_t` from a binary file, given a `lv_fs_file_t`.
+ *
+ * Memory allocations on `lvgl_load_font` should be immediately zeroed and
+ * the pointer should be set on the `lv_font_t` data before any possible return.
+ *
+ * When something fails, it returns `false` and the memory on the `lv_font_t`
+ * still needs to be freed using `lv_binfont_destroy`.
+ *
+ * `lv_binfont_destroy` will assume that all non-null pointers are allocated and
+ * should be freed.
+ */
+static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
+{
+    lv_font_fmt_txt_dsc_t *font_dsc = (lv_font_fmt_txt_dsc_t *)lv_malloc(sizeof(lv_font_fmt_txt_dsc_t));
+    lv_memset(font_dsc, 0, sizeof(lv_font_fmt_txt_dsc_t));
+
+    glyph_info *info = (glyph_info *)lv_malloc(sizeof(glyph_info));
+    info->fp = fp;
+
+    font->dsc = font_dsc;
+    font->user_data = info;
+
+    /*header*/
+    int32_t header_length = read_label_length(fp, 0);
+    if (header_length < 0)
+    {
+        return false;
+    }
+
+    font_header_bin_t font_header;
+    lv_memset(&font_header, 0, sizeof(font_header_bin_t));
+    if (lv_fs_read(fp, &font_header, sizeof(font_header_bin_t), NULL) != LV_FS_RES_OK)
+    {
+        return false;
+    }
+
+    font->base_line = -font_header.descent;
+    font->line_height = font_header.ascent - font_header.descent;
+    font->get_glyph_dsc = lv_font_runtime_get_glyph_dsc;
+    font->get_glyph_bitmap = lv_font_runtime_get_glyph_bitmap;
+    font->subpx = font_header.subpixels_mode;
+    font->underline_position = (int8_t) font_header.underline_position;
+    font->underline_thickness = (int8_t) font_header.underline_thickness;
+
+    font_dsc->bpp = font_header.bits_per_pixel;;
+    font_dsc->kern_scale = font_header.kerning_scale;
+    font_dsc->bitmap_format = font_header.compression_id;
+
+    /*cmaps*/
+    uint32_t cmaps_start = header_length;
+    int32_t cmaps_length = load_cmaps(fp, font_dsc, cmaps_start);
+    if(cmaps_length < 0) {
+        return false;
+    }
+
+    /*kerning*/
+    if(font_header.tables_count < 4) {
+        font_dsc->kern_dsc = NULL;
+        font_dsc->kern_classes = 0;
+        font_dsc->kern_scale = 0;
+        return true;
+    }
+
+
+    uint32_t kern_start = cmaps_start + cmaps_length;
+    int32_t kern_length = load_kern(fp, font_dsc, font_header.glyph_id_format, kern_start);
+
+    info->glyph_dsc_offset = kern_start + kern_length;
+    uint32_t glyph_dsc_length  = read_label_length(fp, info->glyph_dsc_offset);
+
+    info->glyph_bitmap_offset = info->glyph_dsc_offset + glyph_dsc_length;
+
+    return kern_length >= 0;
+    return true;
 }
 
 static int32_t read_label_length(lv_fs_file_t * fp, uint32_t start)
@@ -389,7 +507,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
  * Store the result in `dsc_out`.
  * The next letter (`unicode_letter_next`) might be used to calculate the width required by this glyph (kerning)
  */
-bool lv_font_runtime_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
+static bool lv_font_runtime_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next)
 {
     bool is_tab = unicode_letter == '\t';
@@ -416,7 +534,7 @@ bool lv_font_runtime_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t *
 
     uint32_t glyph_dsc_num;
     lv_font_fmt_txt_glyph_dsc_t gdsc;
-
+    lv_memzero(&gdsc, sizeof(lv_font_fmt_txt_glyph_dsc_t));
     lv_fs_seek(fp,info->glyph_dsc_offset,LV_FS_SEEK_SET);
 
     if (lv_fs_read(fp, &glyph_dsc_num, sizeof(uint32_t), NULL) != LV_FS_RES_OK)
@@ -480,7 +598,8 @@ const void *lv_font_runtime_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_dra
     uint32_t gid = g_dsc->gid.index;
     if(!gid) return NULL;
 
-    lv_font_fmt_txt_glyph_dsc_t gdsc = {0};
+    lv_font_fmt_txt_glyph_dsc_t gdsc;
+    lv_memzero(&gdsc, sizeof(lv_font_fmt_txt_glyph_dsc_t));
     lv_fs_seek(fp,info->glyph_dsc_offset,LV_FS_SEEK_SET);
 
     if (lv_fs_seek(fp,gid * sizeof(lv_font_fmt_txt_glyph_dsc_t) + sizeof(uint32_t ),LV_FS_SEEK_CUR) != LV_FS_RES_OK
@@ -622,82 +741,4 @@ const void *lv_font_runtime_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_dra
 
     /*If not returned earlier then the letter is not found in this font*/
     return NULL;
-}
-/*
- * Loads a `lv_font_t` from a binary file, given a `lv_fs_file_t`.
- *
- * Memory allocations on `lvgl_load_font` should be immediately zeroed and
- * the pointer should be set on the `lv_font_t` data before any possible return.
- *
- * When something fails, it returns `false` and the memory on the `lv_font_t`
- * still needs to be freed using `lv_binfont_destroy`.
- *
- * `lv_binfont_destroy` will assume that all non-null pointers are allocated and
- * should be freed.
- */
-static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
-{
-    lv_font_fmt_txt_dsc_t *font_dsc = (lv_font_fmt_txt_dsc_t *)
-            lv_malloc(sizeof(lv_font_fmt_txt_dsc_t));
-
-    glyph_info *info = (glyph_info *)lv_malloc(sizeof(glyph_info));
-
-    font->user_data = info;
-    info->fp = fp;
-
-    lv_memset(font_dsc, 0, sizeof(lv_font_fmt_txt_dsc_t));
-
-    font->dsc = font_dsc;
-
-    /*header*/
-    int32_t header_length = read_label_length(fp, 0);
-    if (header_length < 0)
-    {
-        return false;
-    }
-
-    font_header_bin_t font_header;
-    if (lv_fs_read(fp, &font_header, sizeof(font_header_bin_t), NULL) != LV_FS_RES_OK)
-    {
-        return false;
-    }
-
-    font->base_line = -font_header.descent;
-    font->line_height = font_header.ascent - font_header.descent;
-    font->get_glyph_dsc = lv_font_runtime_get_glyph_dsc;
-    font->get_glyph_bitmap = lv_font_runtime_get_glyph_bitmap;
-    font->subpx = font_header.subpixels_mode;
-    font->underline_position = (int8_t) font_header.underline_position;
-    font->underline_thickness = (int8_t) font_header.underline_thickness;
-
-    font_dsc->bpp = font_header.bits_per_pixel;;
-    font_dsc->kern_scale = font_header.kerning_scale;
-    font_dsc->bitmap_format = font_header.compression_id;
-
-    /*cmaps*/
-    uint32_t cmaps_start = header_length;
-    int32_t cmaps_length = load_cmaps(fp, font_dsc, cmaps_start);
-    if(cmaps_length < 0) {
-        return false;
-    }
-
-    /*kerning*/
-    if(font_header.tables_count < 4) {
-        font_dsc->kern_dsc = NULL;
-        font_dsc->kern_classes = 0;
-        font_dsc->kern_scale = 0;
-        return true;
-    }
-
-
-    uint32_t kern_start = cmaps_start + cmaps_length;
-    int32_t kern_length = load_kern(fp, font_dsc, font_header.glyph_id_format, kern_start);
-
-    info->glyph_dsc_offset = kern_start + kern_length;
-    uint32_t glyph_dsc_length  = read_label_length(fp, info->glyph_dsc_offset);
-
-    info->glyph_bitmap_offset = info->glyph_dsc_offset + glyph_dsc_length;
-
-    return kern_length >= 0;
-    return true;
 }
