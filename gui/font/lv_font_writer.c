@@ -76,6 +76,12 @@ static bool write_header(lv_fs_file_t *fp, const lv_font_t *font)
     header_bin.underline_position = (int16_t)font->underline_position;
     header_bin.underline_thickness = (int16_t)font->underline_thickness;
 
+    if (!fdsc->kern_classes)
+    {
+        const lv_font_fmt_txt_kern_pair_t *kern_pair = (lv_font_fmt_txt_kern_pair_t *)fdsc->kern_dsc;
+        header_bin.glyph_id_format = kern_pair->glyph_ids_size;
+    }
+
     if (lv_fs_write(fp,&header_length, sizeof(uint32_t),NULL) != LV_FS_RES_OK)
         return false;
 
@@ -104,8 +110,23 @@ static bool write_cmaps(lv_fs_file_t *fp, lv_font_fmt_txt_dsc_t *fdsc)
 
         if (cmaps[i].list_length > 0)
         {
-            cmap_bin[i].data_offset = sum_data_length;
-            sum_data_length += cmaps[i].list_length;
+            if (cmaps[i].type == LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL )
+            {
+                sum_data_length += cmaps[i].list_length;
+
+                if (i >= 1)
+                    cmap_bin[i].data_offset =  cmap_bin[i - 1].data_offset  +  cmap_bin[i - 1].data_entries_count;
+
+            }
+            else if (cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL || cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_TINY)
+            {
+
+                sum_data_length += cmaps[i].list_length * sizeof(uint16_t);
+
+                if (i >= 1)
+                    cmap_bin[i].data_offset =  cmap_bin[i - 1].data_offset  +
+                            cmap_bin[i - 1].data_entries_count * sizeof(uint16_t);
+            }
         }
     }
 
@@ -127,7 +148,7 @@ static bool write_cmaps(lv_fs_file_t *fp, lv_font_fmt_txt_dsc_t *fdsc)
         {
             case LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL:
             {
-                if (lv_fs_write(fp,cmaps->glyph_id_ofs_list, cmap_bin[i].data_entries_count,NULL) != LV_FS_RES_OK)
+                if (lv_fs_write(fp,cmaps[i].glyph_id_ofs_list, cmap_bin[i].data_entries_count,NULL) != LV_FS_RES_OK)
                     return false;
                 break;
             }
@@ -136,12 +157,12 @@ static bool write_cmaps(lv_fs_file_t *fp, lv_font_fmt_txt_dsc_t *fdsc)
             case LV_FONT_FMT_TXT_CMAP_SPARSE_FULL:
             case LV_FONT_FMT_TXT_CMAP_SPARSE_TINY:
             {
-                if (lv_fs_write(fp,cmaps->unicode_list, sizeof(uint16_t) * cmap_bin[i].data_entries_count,NULL) != LV_FS_RES_OK)
+                if (lv_fs_write(fp,cmaps[i].unicode_list, sizeof(uint16_t) * cmap_bin[i].data_entries_count,NULL) != LV_FS_RES_OK)
                     return false;
 
                 if(cmap_bin[i].format_type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL)
                 {
-                    if (lv_fs_write(fp,cmaps->glyph_id_ofs_list, sizeof(uint16_t) * cmap_bin[i].data_entries_count,NULL) != LV_FS_RES_OK)
+                    if (lv_fs_write(fp,cmaps[i].glyph_id_ofs_list, sizeof(uint16_t) * cmap_bin[i].data_entries_count,NULL) != LV_FS_RES_OK)
                         return false;
                 }
                 break;
@@ -211,7 +232,7 @@ static bool write_kern(lv_fs_file_t *fp, const lv_font_fmt_txt_dsc_t *fdsc)
     if (is_kern_class)
     {
         const lv_font_fmt_txt_kern_classes_t *kern = (lv_font_fmt_txt_kern_classes_t *)fdsc->kern_dsc;
-        kern_length = sizeof(uint32_t) * 3 + kern_class_mapping_length * 2 + kern->left_class_cnt * kern->right_class_cnt;
+        kern_length = sizeof(uint32_t) * 2 + sizeof(uint32_t) * 3 + kern_class_mapping_length * 2 + kern->left_class_cnt * kern->right_class_cnt;
         kern_format_type = 3;
     }
     else
@@ -219,7 +240,7 @@ static bool write_kern(lv_fs_file_t *fp, const lv_font_fmt_txt_dsc_t *fdsc)
         const lv_font_fmt_txt_kern_pair_t *kern_pair = (lv_font_fmt_txt_kern_pair_t * )fdsc->kern_dsc;
         uint32_t glyph_entries = kern_pair->pair_cnt;
         uint32_t ids_size = kern_pair->glyph_ids_size == 0 ? sizeof(int8_t) * 2 * glyph_entries : sizeof(int16_t) * 2 * glyph_entries;
-        kern_length = sizeof(uint32_t) * 3 + ids_size + glyph_entries;
+        kern_length = sizeof(uint32_t) * 2 + sizeof(uint32_t) + ids_size + glyph_entries;
         kern_format_type = 0;
     }
 
@@ -254,7 +275,7 @@ static bool write_glyph_bitmap(lv_fs_file_t *fp, const lv_font_fmt_txt_dsc_t *fd
     const lv_font_fmt_txt_glyph_dsc_t * glyph_dsc_last = &fdsc->glyph_dsc[glyph_dsc_num - 1];
 
     uint32_t glyph_bitmap_length = glyph_dsc_last->bitmap_index +
-                                   (uint32_t)ceil((glyph_dsc_last->box_w * glyph_dsc_last->box_h * 1.0) / (sizeof(uint8_t) * 1.0 / fdsc->bpp));
+                                   (uint32_t)ceil((glyph_dsc_last->box_w * glyph_dsc_last->box_h * 1.0) / (8.0 / fdsc->bpp));
 
     uint32_t glyph_bitmap_byte_length = sizeof(uint32_t) + glyph_bitmap_length;
 

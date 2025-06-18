@@ -20,7 +20,7 @@ namespace UI
         lv_obj_set_style_text_font(label_runtime,font,0);
         lv_obj_set_style_text_color(label_runtime,lv_color_white(),0);
         lv_obj_set_style_text_align(label_runtime,LV_TEXT_ALIGN_CENTER,0);
-        lv_label_set_text(label_runtime,"this is a test");
+        lv_label_set_text(label_runtime,"中文测试");
         lv_obj_align(label_runtime,LV_ALIGN_TOP_MID,0,0);
 
         lv_obj_set_style_text_font(label_font,&cbin_16,0);

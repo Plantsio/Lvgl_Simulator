@@ -13,7 +13,7 @@ typedef struct font_header_bin {
     uint8_t bits_per_pixel;
     uint8_t compression_id;
     uint8_t subpixels_mode;
-    uint8_t padding;
+    uint8_t glyph_id_format;
     int16_t underline_position;
     uint16_t underline_thickness;
 } font_header_bin_t;

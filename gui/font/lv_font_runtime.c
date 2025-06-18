@@ -68,7 +68,7 @@ static bool load_cmaps_tables(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_ds
     }
 
     for(unsigned int i = 0; i < font_dsc->cmap_num; ++i) {
-        lv_fs_res_t res = lv_fs_seek(fp, cmaps_start + cmap_table[i].data_offset, LV_FS_SEEK_SET);
+        lv_fs_res_t res = lv_fs_seek(fp, cmap_table[i].data_offset, LV_FS_SEEK_CUR);
         if(res != LV_FS_RES_OK) {
             return false;
         }
@@ -219,11 +219,9 @@ static int32_t load_kern(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc, ui
         return -1;
     }
 
-    uint8_t kern_format_type;
-    int32_t padding;
-    uint32_t br;
-    if(lv_fs_read(fp, &kern_format_type, sizeof(uint8_t), NULL) != LV_FS_RES_OK ||
-       lv_fs_read(fp, &padding, 3 * sizeof(uint8_t), &br) != LV_FS_RES_OK) {
+    int32_t kern_format_type;
+    if(lv_fs_read(fp, &kern_format_type, sizeof(uint32_t), NULL) != LV_FS_RES_OK)
+    {
         return -1;
     }
 

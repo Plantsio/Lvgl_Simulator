@@ -67,6 +67,9 @@ static lv_display_t * hal_init(int32_t w, int32_t h);
 #include "Lottie.h"
 #include "RuntimeFont.h"
 #include "lv_font_runtime.h"
+#include "lv_font_writer.h"
+
+#define LV_TEST   0
 
 void sys_init()
 {
@@ -98,7 +101,7 @@ std::shared_ptr<UI::Base> ui_init()
 
 void font_test()
 {
-    write_bin();
+    lv_font_write(&cbin_16,"S:..\\resources\\cbin_16.cbin");
 
     //lv_bin_runtime_create("S:..\\resources\\ba_16.cbin");
 }
@@ -128,15 +131,25 @@ int main(int argc, char **argv)
 //      }
 //  }
 
-  //sys_init();
+#if LV_TEST
+
+   font_test();
+#else
+
+    //sys_init();
 
   auto UI = ui_init();
+#endif
 
-//    font_test();
+
 
   while(1) {
 
+#if LV_TEST
+
+#else
       UI->routine();
+#endif
 
       /* Periodically call the lv_task handler.
        * It could be done in a timer interrupt or an OS task too.*/
