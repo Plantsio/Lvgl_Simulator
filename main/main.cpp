@@ -83,8 +83,8 @@ std::shared_ptr<UI::Base> ui_init()
     //region UI make
     //ui = std::make_shared<UI::UITutorial>(nullptr);
     //ui = std::make_shared<UI::FontTTF>();
-    //ui = std::make_shared<UI::Lottie>();
-    ui = std::make_shared<UI::RuntimeFont>();
+    ui = std::make_shared<UI::Lottie>();
+    //ui = std::make_shared<UI::RuntimeFont>();
     //endregion
 
     if (ui && ui->load())
@@ -101,7 +101,7 @@ std::shared_ptr<UI::Base> ui_init()
 
 void font_test()
 {
-    lv_font_write(&cbin_16,"S:..\\resources\\cbin_16.cbin");
+    lv_font_write(&lt_pro_normal,"S:..\\resources\\lt_pro_normal.cbin");
 
     //lv_bin_runtime_create("S:..\\resources\\ba_16.cbin");
 }

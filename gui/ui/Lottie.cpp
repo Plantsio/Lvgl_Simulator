@@ -20,7 +20,7 @@ namespace UI
 //            log_d("??????????");
 //        else
 //            log_d("vvvvvvvv");
-        lv_lottie_set_src_file(lottie, path({REPO_DIR,"lottie","think.json"}).c_str());
+        lv_lottie_set_src_file(lottie, path({REPO_DIR,"lottie","sunny-weather.json"}).c_str());
 
 #if LV_DRAW_BUF_ALIGN == 4 && LV_DRAW_BUF_STRIDE_ALIGN == 1
         /*If there are no special requirements, just declare a buffer
