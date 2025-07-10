@@ -72,10 +72,10 @@ int JPEGDEC::openRAM(uint8_t *pData, int iDataSize, JPEG_DRAW_CALLBACK *pfnDraw,
     _jpeg.pfnClose = NULL;
     _jpeg.JPEGFile.iSize = iDataSize;
     _jpeg.JPEGFile.pData = pData;
-    //_jpeg.usUnalignedPixels = usUnalignedPixels;
-    //_jpeg.sUnalignedMCUs = sUnalignedMCUs;
+    _jpeg.usUnalignedPixels = usUnalignedPixels;
+    _jpeg.sUnalignedMCUs = sUnalignedMCUs;
     _jpeg.iMaxMCUs = 3000; // set to an unnaturally high value to start
-    //_jpeg.ucFileBuf = ucFileBuf;
+    _jpeg.ucFileBuf = ucFileBuf;
     return JPEGInit(&_jpeg);
 } /* openRAM() */
 
