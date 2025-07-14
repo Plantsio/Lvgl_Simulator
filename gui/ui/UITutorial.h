@@ -76,7 +76,7 @@ namespace UI
         BasicText mTopText;
         BasicText mBottomText;
         Indicator mIndicator;
-        Image     mImage;
+        //Image     mImage;
 
         lv_obj_t *m_circles[2] = {};
 	};

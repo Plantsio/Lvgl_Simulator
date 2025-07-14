@@ -5119,6 +5119,7 @@ static int DecodeJPEG(JPEGIMAGE *pJPEG)
         jd.x = pJPEG->iXOffset;
         xoff = 0; // start of new LCD output group
         if (pJPEG->pFramebuffer) { // user-supplied buffer is full width
+            printf("%p",pJPEG->pFramebuffer);
             int ty = (y * mcuCY) - pJPEG->iCropY;
             iPitch = pJPEG->iCropCX; // size of cropped width
             pJPEG->usPixels = (uint16_t *)pJPEG->pFramebuffer;

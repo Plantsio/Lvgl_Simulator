@@ -68,12 +68,15 @@ static lv_display_t * hal_init(int32_t w, int32_t h);
 #include "RuntimeFont.h"
 #include "lv_font_runtime.h"
 #include "lv_font_writer.h"
+#include "UIImage.h"
+#include "Image.h"
 
 #define LV_TEST   0
 
 void sys_init()
 {
     Theme::instance().initialize();
+    UI::Image::registerMjpegImageDecoder();
 }
 
 std::shared_ptr<UI::Base> ui_init()
@@ -83,8 +86,9 @@ std::shared_ptr<UI::Base> ui_init()
     //region UI make
     //ui = std::make_shared<UI::UITutorial>(nullptr);
     //ui = std::make_shared<UI::FontTTF>();
-    ui = std::make_shared<UI::Lottie>();
+    //ui = std::make_shared<UI::Lottie>();
     //ui = std::make_shared<UI::RuntimeFont>();
+    ui = std::make_shared<UI::UIImage>();
     //endregion
 
     if (ui && ui->load())
@@ -136,7 +140,7 @@ int main(int argc, char **argv)
    font_test();
 #else
 
-    //sys_init();
+    sys_init();
 
   auto UI = ui_init();
 #endif

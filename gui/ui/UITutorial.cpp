@@ -90,8 +90,8 @@ namespace UI
     TuBase(),
     mTopText(parent),
     mBottomText(parent),
-    mIndicator(parent),
-    mImage(parent)
+    mIndicator(parent)
+    //mImage(parent)
 	{
         mTopText.set_font_size(16);
         mBottomText.set_font_size(16);
@@ -131,7 +131,7 @@ namespace UI
 
         registerStepCB([&](){
             mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_two));
-            mImage.update("touch_bar");
+            //mImage.update("touch_bar");
             return true;
         });
 
@@ -194,8 +194,8 @@ namespace UI
     mSubText(parent, 300),
     mMidText(parent, 300, 800, 600),
     mBottomText(parent),
-    mIndicator(parent),
-    mImage(parent)
+    mIndicator(parent)
+    //mImage(parent)
 	{
         mTopText.set_font_size(16);
         mSubText.set_font_size(16);
@@ -224,7 +224,7 @@ namespace UI
             std::string download_app = THEME_TEXT_OPTION(Lang::ui_tu_download_app, vendor);
             mSubText.update(Theme::getPaletteText(download_app,Theme::palette_notice));
 
-            mImage.update("app_60");
+            //mImage.update("app_60");
             return true;
         });
 
@@ -242,7 +242,7 @@ namespace UI
 
             mTopText.update(THEME_TEXT_CONTENT(Lang::ui_in_system_setting));
             mSubText.update(THEME_TEXT_IN_COLOR(Lang::ui_enable_ble,Theme::palette_notice));
-            mImage.update("bluetooth");
+            //mImage.update("bluetooth");
             return true;
         });
 
@@ -265,8 +265,8 @@ namespace UI
 	TuWater::TuWater(lv_obj_t *parent):
     TuBase(),
     mTopText(parent),
-    mIndicator(parent),
-    mImage(parent)
+    mIndicator(parent)
+    //mImage(parent)
 	{
         mTopText.set_font_size(16);
         mTopText.align( LV_ALIGN_TOP_MID, 0, 15);
@@ -281,7 +281,7 @@ namespace UI
 
         registerStepCB([&](){
             mTopText.update(THEME_TEXT_APPEND_COLOR(Lang::ui_tu_water_remove_pot,Theme::palette_notice));
-            mImage.update("add_water");
+            //mImage.update("add_water");
             return true;
         });
 
@@ -371,8 +371,8 @@ namespace UI
     TuBase(),
     mTopText(parent),
     mIndicator(parent),
-    mBottomText(parent),
-    mImage(parent)
+    mBottomText(parent)
+    //mImage(parent)
 	{
         mTopText.set_font_size(16);
         mBottomText.set_font_size(16);
@@ -385,7 +385,7 @@ namespace UI
     {
         registerStepCB([&](){
             mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_plant_put_pot));
-            mImage.update("put_in");
+            //mImage.update("put_in");
             mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_right_next), true, 3000);
             mIndicator.enable_visible(Indicator::RIGHT, true, 1000, 4200);
             return true;
