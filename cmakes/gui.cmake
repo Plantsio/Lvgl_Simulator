@@ -6,7 +6,6 @@ list(APPEND GUI_INCLUDES
         ${GUI_PATH}
         ${GUI_PATH}/components/Animation
         ${GUI_PATH}/components/Base
-        ${GUI_PATH}/components/Image
         ${GUI_PATH}/components/Indicator
         ${GUI_PATH}/components/ProgressBar
         ${GUI_PATH}/components/Text
@@ -16,6 +15,7 @@ list(APPEND GUI_INCLUDES
         ${GUI_PATH}/theme
         ${GUI_PATH}/font
         ${GUI_PATH}/ui
+        ${GUI_PATH}/jpeg
 )
 
 file(GLOB_RECURSE GUI_SOURCES
