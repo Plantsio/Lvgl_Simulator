@@ -9,7 +9,7 @@
 #include <stack>
 
 #include "UIBase.h"
-#include "StepBase.h"
+#include "components/Step/StepHandler.h"
 #include "Indicator.h"
 #include "BasicText.h"
 #include "Image.h"
@@ -33,10 +33,15 @@ namespace UI
         InputEvtType mInputEvtType{};
     };
 
-    class TuBase : public Initializable,public StepBase
+    class TuBase : public Initializable
     {
     public:
-        TuBase():StepBase(){}
+        void start();
+
+        bool finished();
+
+    protected:
+        StepHandler mStepHandler;
     private:
         bool _initialize() override {return true;}
     };
@@ -49,11 +54,7 @@ namespace UI
 	private:
         bool _initialize() final;
 
-		void update(const std::string &main, const std::string &sub);
-
-		void update_main(const std::string &main);
-
-		void update_sub(const std::string &sub);
+        void registerStep(const std::string &main,const std::string &sub);
 
     private:
         BasicText mMainText;
@@ -76,7 +77,7 @@ namespace UI
         BasicText mTopText;
         BasicText mBottomText;
         Indicator mIndicator;
-        //Image     mImage;
+        Image     mImage;
 
         lv_obj_t *m_circles[2] = {};
 	};
@@ -195,7 +196,7 @@ namespace UI
         lv_style_t dotStyle{};
     };
 
-    class UITutorial : public Base, public StepBase
+    class UITutorial : public Base, public StepHandler
 	{
 	public:
 		explicit UITutorial(ObjPtr obj);

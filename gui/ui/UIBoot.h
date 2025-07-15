@@ -8,64 +8,28 @@
 #include <functional>
 
 #include "UIBase.h"
-#include "StepBase.h"
+#include "components/Step/StepHandler.h"
 #include "Progress.h"
 
 
 namespace UI {
-    class UIBoot : public Base, public StepBase
+    class UIBoot : public Base
     {
     public:
         explicit UIBoot(ObjPtr obj);
 
-    public:
+    private:
         using ConditionCb = std::function<bool()>;
-        using HandleCb = std::function<void()>;
 
-        enum BootStep
-        {
-            boot_connecting,
-            boot_activating,
-            boot_tuning_time,
-            boot_locating,
-            boot_physical_check,
-            boot_plant_detect,
-            boot_step_num,
-        };
-
-        //using ConditionCb = std::function<bool()>;
-
-    public:
-        static void set(const std::string &desc, int progress);
+    private:
+        bool _initialize() override;
 
         void update_now(const std::string &desc, int progress);
 
-        bool check_routine(const ConditionCb &condition, int progress, int timeout,
-                           const HandleCb &success_handler,
-						   const HandleCb &fail_handler);
-
-        static int get_current_progress();
-
-        static void set_current_progress(int progress);
-
-        static std::string get_current_desc();
-
-        static void set_current_desc(const std::string &desc);
-
+        void registerStep(ConditionCb condition,uint32_t conditionTimeout,const std::string &successDsc,const std::string &failDsc,int failToJump = STEP_FAIL_NO_JUMP);
 
     private:
-        void refresh_timeout();
-
-        bool _initialize() override;
-
-    private:
-        int m_current_step = 0;
-        uint32_t m_current_start_t = 0;
-
-        uint32_t m_plant_detect_cnt = 0;
-
-        bool over_time = false;
-
+        StepHandler mStepHandler;
         Progress mProcess;
     };
 }

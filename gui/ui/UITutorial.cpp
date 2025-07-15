@@ -14,6 +14,18 @@
 
 namespace UI
 {
+    //region TuBase
+    void TuBase::start()
+    {
+        mStepHandler.start();
+    }
+
+    bool TuBase::finished()
+    {
+        return mStepHandler.finished();
+    }
+    //endregion
+
 	//region intro
 	TuIntro::TuIntro(lv_obj_t *parent) :
     TuBase(),
@@ -28,62 +40,35 @@ namespace UI
 
     bool TuIntro::_initialize()
     {
-        registerStepCB([&](){
-            update(THEME_TEXT_CONTENT(Lang::ui_tu_intro_hi),"");
-            return true;
-        });
-        registerStepCB([&](){
-            update_main(THEME_TEXT_CONTENT(Lang::ui_tu_intro_ivy));
-            return true;
-        });
-        registerStepCB([&](){
-            update_main(THEME_TEXT_CONTENT(Lang::ui_tu_intro_meet));
-            return true;
-        });
-        registerStepCB([&](){
-            update_main(THEME_TEXT_CONTENT(Lang::ui_tu_intro_before_enter));
-            return true;
-        });
-        registerStepCB([&](){
-            update_main(THEME_TEXT_CONTENT(Lang::ui_tu_intro_ready));
-            return true;
-        });
-        registerStepCB([&](){
-            update_sub(THEME_TEXT_IN_COLOR(Lang::ui_tu_intro_shutdown,Theme::palette_notice));
-            return true;
-        });
+        registerStep(THEME_TEXT_CONTENT(Lang::ui_tu_intro_hi),"");
 
-        registerStepCB([&](){
-            update(THEME_TEXT_CONTENT(Lang::ui_tu_skip),"");
-            return true;
-        });
+        registerStep(THEME_TEXT_CONTENT(Lang::ui_tu_intro_ivy),"");
 
-        registerStepCB([&](){
-            update("", "");
-            return true;
-        });
+        registerStep(THEME_TEXT_CONTENT(Lang::ui_tu_intro_meet),"");
 
-        enableAutoStep();
+        registerStep(THEME_TEXT_CONTENT(Lang::ui_tu_intro_before_enter),"");
+
+        auto mainDsc = THEME_TEXT_CONTENT(Lang::ui_tu_intro_ready);
+        registerStep(mainDsc,"");
+        registerStep(mainDsc,THEME_TEXT_IN_COLOR(Lang::ui_tu_intro_shutdown,Theme::palette_notice));
+
+        registerStep(THEME_TEXT_CONTENT(Lang::ui_tu_skip),"");
+
+        registerStep("","");
 
         return true;
     }
 
-	void TuIntro::update(const std::string &main, const std::string &sub)
-	{
-		update_main(main);
-		update_sub(sub);
-	}
-
-	void TuIntro::update_main(const std::string &main)
-	{
-        mMainText.update(main);
-	}
-
-	void TuIntro::update_sub(const std::string &sub)
-	{
-        mSubText.update(sub);
-	}
-
+    void TuIntro::registerStep(const std::string &main,const std::string &sub)
+    {
+        auto commonTrue = [](uint32_t &timeout){timeout = 0;return true;};
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          mMainText.update(main);
+                                          mSubText.update(sub);
+                                      }, nullptr);
+    }
 	//endregion
 
 	TuTouchBar::TuTouchBar(lv_obj_t *parent) :
@@ -124,61 +109,64 @@ namespace UI
 
     bool TuTouchBar::_initialize()
     {
-        registerStepCB([&](){
-            mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_interact));
-            return true;
-        });
+        auto commonTrue = [](uint32_t &timeout){timeout = 0;return true;};
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_interact));
+                                      }, nullptr);
 
-        registerStepCB([&](){
-            mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_two));
-            //mImage.update("touch_bar");
-            return true;
-        });
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_two));
+                                          //mImage.update("touch_bar");
+                                      }, nullptr);
 
-        registerStepCB([&](){
-            for (auto &circle: m_circles)
-            {
-                Animation::anim_create(circle, reinterpret_cast<lv_anim_exec_xcb_t>(lv_arc_set_bg_end_angle), 0, 360,
-                                       2000);
-            }
-            return true;
-        });
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          for (auto &circle: m_circles)
+                                          {
+                                              Animation::anim_create(circle, reinterpret_cast<lv_anim_exec_xcb_t>(lv_arc_set_bg_end_angle), 0, 360,
+                                                                     2000);
+                                          }
+                                      }, nullptr);
 
-        registerStepCB([&](){
-            mTopText.update(THEME_TEXT_IN_COLOR(Lang::ui_tu_touch_bar_yellow_dot,Theme::palette_notice));
-            for (auto &circle: m_circles)
-            {
-                Animation::anim_fade_out(circle, 2000,0);
-            }
-            return true;
-        });
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          mTopText.update(THEME_TEXT_IN_COLOR(Lang::ui_tu_touch_bar_yellow_dot,Theme::palette_notice));
+                                          for (auto &circle: m_circles)
+                                          {
+                                              Animation::anim_fade_out(circle, 2000,0);
+                                          }
+                                      }, nullptr);
 
-        registerStepCB([&](){
-            mIndicator.enable_visible_flashing(Indicator::ALL,1000,0,1000,500,2);
-            return true;
-        });
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          mIndicator.enable_visible_flashing(Indicator::ALL,1000,0,1000,500,2);
 
-        registerStepCB([&](){
-            mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_left));
-            mIndicator.enable_visible(Indicator::LEFT,true,1000,3000);
-            updateStepPeriod(10);
-            return true;
-        },STEP_ONE_TIME,[&](){ return pressed(BtnSrcLeft);});
+                                          mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_left),true,6000);
+                                          mIndicator.enable_visible(Indicator::LEFT,true,1000,3000);
+                                      }, nullptr);
 
-        registerStepCB([&](){
-            mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_right));
-            mIndicator.disable_visible(Indicator::LEFT, true, 600);
-            mIndicator.enable_visible(Indicator::RIGHT, true, 600);
-            return true;
-        },STEP_ONE_TIME,[&](){ return pressed(BtnSrcRight);});
 
-        registerStepCB([&](){
-            mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_great));
-            mIndicator.disable_visible(Indicator::RIGHT, true, 600);
-            return true;
-        });
+        mStepHandler.registerStepUnit([&](uint32_t &timeout){timeout = portMAX_DELAY;return pressed(BtnSrcLeft);},
+                                      [&]()
+                                      {
+                                          mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_right));
+                                          mIndicator.disable_visible(Indicator::LEFT, true, 600);
+                                          mIndicator.enable_visible(Indicator::RIGHT, true, 600);
+                                      }, nullptr);
 
-        enableAutoStep();
+        mStepHandler.registerStepUnit([&](uint32_t &timeout){timeout = portMAX_DELAY;return pressed(BtnSrcRight);},
+                                      [&]()
+                                      {
+                                          mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_touch_bar_great));
+                                          mIndicator.disable_visible(Indicator::RIGHT, true, 600);
+                                      }, nullptr);
 
         return true;
     }
@@ -210,50 +198,46 @@ namespace UI
 
     bool TuApp::_initialize()
     {
-        registerStepCB([&](){
-            mMidText.update(THEME_TEXT_CONTENT(Lang::ui_tu_add_app));
-            updateStepPeriod(3000);
-            return true;
-        });
+        auto commonTrue = [](uint32_t &timeout){timeout = 0;return true;};
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          mMidText.update(THEME_TEXT_CONTENT(Lang::ui_tu_add_app));
+                                      }, nullptr);
 
-        registerStepCB([&](){
-            int vendor = 0;                               //todo: vendor 是否还有需求
-            mMidText.update("");
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          int vendor = 0;                               //todo: vendor 是否还有需求
+                                          mMidText.update("");
 
-            mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_prov_in_store));
-            std::string download_app = THEME_TEXT_OPTION(Lang::ui_tu_download_app, vendor);
-            mSubText.update(Theme::getPaletteText(download_app,Theme::palette_notice));
+                                          mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_prov_in_store));
+                                          std::string download_app = THEME_TEXT_OPTION(Lang::ui_tu_download_app, vendor);
+                                          mSubText.update(Theme::getPaletteText(download_app,Theme::palette_notice));
 
-            //mImage.update("app_60");
-            return true;
-        });
+                                          //mImage.update("app_60");
 
-        registerStepCB([&](){
-            mIndicator.enable_visible(Indicator::RIGHT, true,1000,1200);
-            mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_right_next));
-            updateStepPeriod(10);
-            return true;
-        },STEP_ONE_TIME,[&](){ return pressed(BtnSrcRight);});
+                                          mIndicator.enable_visible(Indicator::RIGHT, true,1000,1200);
+                                          mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_right_next),true,6000);
+                                      }, nullptr);
 
-        registerStepCB([&](){
-            updateStepPeriod(3000);
-            mBottomText.update("");
-            mIndicator.disable_visible(Indicator::RIGHT, true,500);
+        mStepHandler.registerStepUnit([&](uint32_t &timeout){timeout = portMAX_DELAY;return pressed(BtnSrcRight);},
+                                      [&]()
+                                      {
+                                          mBottomText.update("");
+                                          mIndicator.disable_visible(Indicator::RIGHT, true,500);
 
-            mTopText.update(THEME_TEXT_CONTENT(Lang::ui_in_system_setting));
-            mSubText.update(THEME_TEXT_IN_COLOR(Lang::ui_enable_ble,Theme::palette_notice));
-            //mImage.update("bluetooth");
-            return true;
-        });
+                                          mTopText.update(THEME_TEXT_CONTENT(Lang::ui_in_system_setting));
+                                          mSubText.update(THEME_TEXT_IN_COLOR(Lang::ui_enable_ble,Theme::palette_notice));
+                                      }, nullptr);
 
-        registerStepCB([&](){
-            mIndicator.enable_visible(Indicator::RIGHT, true,1000,1200);
-            mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_touch_right_config));
-            updateStepPeriod(10);
-            return true;
-        },STEP_ONE_TIME,[&](){ return pressed(BtnSrcRight);});
+        mStepHandler.registerStepUnit([&](uint32_t &timeout){timeout = portMAX_DELAY;return pressed(BtnSrcRight);},
+                                      [&]()
+                                      {
+                                          mIndicator.enable_visible(Indicator::RIGHT, true,1000,1200);
+                                          mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_touch_right_config));
+                                      }, nullptr);
 
-        enableAutoStep();
         return true;
     }
 
@@ -274,25 +258,30 @@ namespace UI
 
     bool TuWater::_initialize()
     {
-        registerStepCB([&](){
-            mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_prepare_plant));
-            return true;
-        });
+        auto commonTrue = [](uint32_t &timeout){timeout = 0;return true;};
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_prepare_plant));
+                                      }, nullptr);
 
-        registerStepCB([&](){
-            mTopText.update(THEME_TEXT_APPEND_COLOR(Lang::ui_tu_water_remove_pot,Theme::palette_notice));
-            //mImage.update("add_water");
-            return true;
-        });
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          mTopText.update(THEME_TEXT_APPEND_COLOR(Lang::ui_tu_water_remove_pot,Theme::palette_notice));
+                                          //mImage.update("add_water");
 
-        registerStepCB([&](){
-            mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_right_next));
-            mIndicator.enable_visible(Indicator::RIGHT,true,1000,1200);
-            updateStepPeriod(10);
-            return true;
-        },STEP_ONE_TIME,[&](){ return pressed(BtnSrcRight);});
+                                          mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_right_next));
+                                          mIndicator.enable_visible(Indicator::RIGHT,true,1000,1200);
+                                      }, nullptr);
 
-        enableAutoStep();
+        mStepHandler.registerStepUnit([&](uint32_t &timeout){timeout = portMAX_DELAY;return pressed(BtnSrcRight);},
+                                      [&]()
+                                      {
+                                          mTopText.update("");
+                                          mIndicator.disable_visible(Indicator::RIGHT, true,500);
+                                      }, nullptr);
+
         return true;
     }
 
@@ -319,46 +308,39 @@ namespace UI
 
     bool TuWaterAssist::_initialize()
     {
-        registerStepCB([&](){
-            mTopText.update(THEME_FORMAT_TEXT<int>(Lang::ui_fluid_add_about, {50}));
-            return true;
-        });
+        auto commonTrue = [](uint32_t &timeout){timeout = 0;return true;};
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          mTopText.update(THEME_FORMAT_TEXT<int>(Lang::ui_fluid_add_about, {50}));
+                                      }, nullptr);
 
-        registerStepCB([&](){
-            mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_right_next), true, 3000);
-            mIndicator.enable_visible(Indicator::RIGHT,true,1000,4200);
-            updateStepPeriod(10);
-            return true;
-        });
+        mStepHandler.registerStepUnit([](uint32_t &timeout)
+                                      {
+                                          timeout = 4000;
+                                          return SystemStore::get<int>(DeviceDp::waterlevel) > 0;
+                                      },
+                                      [&]()
+                                      {
+                                          mMidText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_detected));
+                                          mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_right_next), true, 3000);
+                                          mIndicator.enable_visible(Indicator::RIGHT,true,1000,4200);
+                                      },
+                                      [&](int &jumpStep)
+                                      {
+                                          jumpStep = STEP_FAIL_NO_JUMP;
+                                          mMidText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_no_detected));
+                                          mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_right_next), true, 3000);
+                                          mIndicator.enable_visible(Indicator::RIGHT,true,1000,4200);
+                                      });
 
-        auto nextReady = [&](){
-            bool isNext = waterLevel > 0 || pressed(BtnSrcRight);
-            return isNext;
-        };
-        registerStepCB([&](){
-            waterLevel = SystemStore::get<int>(DeviceDp::waterlevel);
+        mStepHandler.registerStepUnit([&](uint32_t &timeout){timeout = portMAX_DELAY;return pressed(BtnSrcRight);},
+                                      [&]()
+                                      {
+                                          mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_assist_good));
+                                          mIndicator.disable_visible(Indicator::RIGHT, true,500);
+                                      }, nullptr);
 
-            if (waterLevel <= 0)
-                mMidText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_no_detected));
-            else
-                mMidText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_detected));
-
-            return true;
-        },STEP_INFINITY,nextReady);
-
-        registerStepCB([&](){
-            updateStepPeriod(COMMON_TIMER_DELAY);
-            mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_assist_good));
-            mIndicator.disable_visible(Indicator::RIGHT, true,500);
-
-            return true;
-        });
-        registerStepCB([&](){
-            updateStepPeriod(1000);
-            return true;
-        });
-
-        enableAutoStep();
         return true;
     }
 
@@ -383,30 +365,37 @@ namespace UI
 
     bool TuPlantDetect::_initialize()
     {
-        registerStepCB([&](){
-            mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_plant_put_pot));
-            //mImage.update("put_in");
-            mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_right_next), true, 3000);
-            mIndicator.enable_visible(Indicator::RIGHT, true, 1000, 4200);
-            return true;
-        });
+        auto commonTrue = [](uint32_t &timeout){timeout = 0;return true;};
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          mTopText.update(THEME_TEXT_CONTENT(Lang::ui_tu_plant_put_pot));
+                                          //mImage.update("put_in");
+                                      }, nullptr);
 
+        mStepHandler.registerStepUnit([](uint32_t &timeout)
+                                      {
+                                          timeout = 4000;
+                                          return SystemStore::get<bool>(DeviceDp::plantExist);
+                                      },
+                                      [&]()
+                                      {
+                                          mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_right_next), true, 3000);
+                                          mIndicator.enable_visible(Indicator::RIGHT, true, 1000, 4200);
+                                      },
+                                      [&](int &jumpStep)
+                                      {
+                                          jumpStep = STEP_FAIL_NO_JUMP;
+                                          mBottomText.update(THEME_TEXT_CONTENT(Lang::ui_tu_water_right_next), true, 3000);
+                                          mIndicator.enable_visible(Indicator::RIGHT, true, 1000, 4200);
+                                      });
 
-        auto nextReady = [&](){
-            return plantExist || pressed(BtnSrcRight);
-        };
-        registerStepCB([&](){
-            updateStepPeriod(10);
-            plantExist = SystemStore::get<bool>(DeviceDp::plantExist);
-            return true;
-        },STEP_INFINITY,nextReady);
+        mStepHandler.registerStepUnit([&](uint32_t &timeout){timeout = portMAX_DELAY;return pressed(BtnSrcRight);},
+                                      [&]()
+                                      {
+                                          mIndicator.disable_visible(Indicator::RIGHT, true,500);
+                                      }, nullptr);
 
-        registerStepCB([&](){
-            updateStepPeriod(1000);
-            return true;
-        });
-
-        enableAutoStep();
         return true;
     }
 
@@ -425,22 +414,18 @@ namespace UI
 
     bool TuFinal::_initialize()
     {
-        registerStepCB([&](){
-            mMidText.update(THEME_TEXT_CONTENT(Lang::ui_tu_congratulations));
-            return true;
-        });
+        auto commonTrue = [](uint32_t &timeout){timeout = 0;return true;};
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          mMidText.update(THEME_TEXT_CONTENT(Lang::ui_tu_congratulations));
+                                      }, nullptr);
 
-        registerStepCB([&](){
-            mMidText.update(THEME_TEXT_CONTENT(Lang::ui_tu_completed));
-            return true;
-        });
-
-        registerStepCB([&](){
-            updateStepPeriod(1000);
-            return true;
-        });
-
-        enableAutoStep();
+        mStepHandler.registerStepUnit(commonTrue,
+                                      [&]()
+                                      {
+                                          mMidText.update(THEME_TEXT_CONTENT(Lang::ui_tu_completed));
+                                      }, nullptr);
         return true;
     }
 
