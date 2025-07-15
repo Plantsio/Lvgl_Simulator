@@ -4,6 +4,7 @@
 
 #include "interface.h"
 #include <cstdlib>
+#include <chrono>
 
 void *heap_caps_malloc(size_t size, char caps)
 {
@@ -23,6 +24,11 @@ void label_set_style(lv_obj_t *label, const lv_font_t *font, lv_color_t color, l
 
 void bar_set_default_style(lv_obj_t *bar) {
     lv_obj_remove_style_all(bar);  /*To have a clean start*/
+}
+
+long long Millis()
+{
+    return std::chrono::duration_cast< std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 namespace Sys

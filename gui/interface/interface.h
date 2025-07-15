@@ -13,6 +13,7 @@
 
 #define MALLOC_CAP_SPIRAM 0
 #define MALLOC_CAP_8BIT   0
+#define portMAX_DELAY     0xffffffffUL
 
 namespace DeviceDp
 {
@@ -121,6 +122,8 @@ void line_set_style(lv_obj_t *line, lv_coord_t width, lv_color_t color, bool is_
 void label_set_style(lv_obj_t *label, const lv_font_t *font, lv_color_t color = lv_color_white(),lv_text_align_t align = LV_TEXT_ALIGN_CENTER);
 
 void bar_set_default_style(lv_obj_t *bar);
+
+long long Millis();
 
 class SystemStore
 {

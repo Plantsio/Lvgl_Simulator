@@ -39,15 +39,12 @@ namespace UI
             return LV_RESULT_INVALID;
 
         const char *img_full_name = (const char *)dsc->src;
-        log_d("img_full_name = %s",img_full_name);
         if (lv_strcmp(lv_fs_get_ext(img_full_name),"mjpeg"))
             return LV_RESULT_INVALID;
 
         uint32_t img_frame_size = 0;
         uint32_t rn = 0;
-        uint32_t pos = 0;
         lv_fs_read(&dsc->file, &img_frame_size, sizeof(uint32_t), &rn);
-        log_d("frame size = %d",img_frame_size);
         if (img_frame_size == 0 || rn != sizeof(uint32_t))
             return LV_RESULT_INVALID;
 
@@ -70,7 +67,6 @@ namespace UI
             return LV_RESULT_INVALID;
         }
 
-        log_d("read all frame...");
         lv_fs_read(&dsc->file, params->mImageFrameCache, img_frame_size, &rn);
         if (rn != img_frame_size)
             return LV_RESULT_INVALID;
@@ -87,14 +83,10 @@ namespace UI
 
         dsc->decoded = decoded;
 
-        log_d("img_width = %d, img_height = %d",img_width,img_height);
-
         header->w  = img_width;
         header->h  = img_height;
         header->cf = LV_COLOR_FORMAT_NATIVE;
         header->magic = LV_IMAGE_HEADER_MAGIC;
-
-        log_d("decoder info over");
 
         return LV_RESULT_OK;
     }
@@ -112,8 +104,6 @@ namespace UI
         decoderParams->mImageDecoder->setUserPointer((lv_draw_buf_t *)dsc->decoded);
         decoderParams->mImageDecoder->decode(0,0,0);
         decoderParams->mImageDecoder->close();
-
-        log_d("decoder open over");
         
         return LV_RESULT_OK;
     }
@@ -127,7 +117,6 @@ namespace UI
         if(dsc->decoded)
             lv_draw_buf_destroy((lv_draw_buf_t *)dsc->decoded);
 
-        log_d("decoder close");
     }
 
     void Image::_cleanUp(MjpegDecoderParams *info)
@@ -137,33 +126,27 @@ namespace UI
             if (info->ucFileBuff) {
                 _aligned_free(info->ucFileBuff);
                 info->ucFileBuff = nullptr;
-                log_d("11111111111");
             }
             if (info->usUnalignedPixels) {
                 _aligned_free(info->usUnalignedPixels);
                 info->usUnalignedPixels = nullptr;
-                log_d("22222222222");
             }
             if (info->sUnalignedMCUs) {
                 _aligned_free(info->sUnalignedMCUs);
                 info->sUnalignedMCUs = nullptr;
-                log_d("33333333333");
             }
             if (info->mImageFrameCache)
             {
                 free(info->mImageFrameCache);
                 info->mImageFrameCache = nullptr;
-                log_d("4444444444");
             }
             if (info->mImageDecoder)
             {
                 delete info->mImageDecoder;
                 info->mImageDecoder = nullptr;
-                log_d("55555555555");
             }
 
             free(info);
-            log_d("666666666");
         }
     }
 
@@ -171,9 +154,6 @@ namespace UI
     {
         auto drawBuff = (lv_draw_buf_t *)draw->pUser;
 
-        auto frame_date = (uint16_t *)drawBuff->data;
-        log_d("w = %d,stride = %d",drawBuff->header.w,drawBuff->header.stride);
-        log_d("draw width = %d,draw height = %d",draw->iWidth,draw->iHeight);
         for (int i = 0; i < draw->iHeight;i ++)
         {
             memcpy((drawBuff->data + (drawBuff->header.w * (i + draw->y) + draw->x) * sizeof(uint16_t)),(draw->pPixels + draw->iWidth * i),draw->iWidth * sizeof(uint16_t));
