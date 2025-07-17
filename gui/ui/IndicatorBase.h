@@ -6,6 +6,7 @@
 #define SIMULATOR_INDICATORBASE_H
 
 #include "lvgl.h"
+
 #define LV_INDI_FADE_T      200
 
 namespace UI {
@@ -17,22 +18,40 @@ namespace UI {
             IndFlash,
             IndLoading,
         };
+        enum IndAnimState {
+            IndAnimNotReady,
+            IndAnimDotOff,
+            IndAnimDotOn,
+            IndAnimLoadingOff,
+            IndAnimLoadingOn,
+        };
     public:
         explicit IndicatorBase(lv_obj_t *parent);
 
-        [[nodiscard]] lv_obj_t *getObj() const {
-            return m_obj;
-        }
-
-        void align(lv_align_t align, int32_t x_ofs, int32_t y_ofs) const;
+        void align(lv_align_t align, int32_t x_ofs, int32_t y_ofs);
 
     public:
         void setState(IndState state);
 
     private:
+        void _setState(IndState state);
+
+        void _setAnimState(IndAnimState readyState) {
+            m_animState = readyState;
+        }
+
+        [[nodiscard]] IndAnimState _getReadyState() const {
+            return m_animState;
+        }
+
+    private:
         lv_obj_t *m_obj;
+        lv_obj_t *m_loading;
 
         IndState m_state = IndHidden;
+        IndAnimState m_animState = IndAnimNotReady;
+
+        lv_anim_t *m_anim = nullptr;
 
     };
 }

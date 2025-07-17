@@ -12,6 +12,7 @@ namespace UI {
             m_scr(lv_obj_create(nullptr)),
             m_obj(std::move(obj)) {
         lv_group_add_obj(lv_group_get_default(), m_scr);
+        lv_obj_set_style_bg_color(m_scr, lv_color_make(0,0,0),0);
         //mIndev.attachIndev(m_scr,[&](InputEvtType &input){return _handleInput(std::forward<InputEvtType>(input));});
     }
 

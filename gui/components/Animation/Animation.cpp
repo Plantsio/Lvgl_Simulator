@@ -9,13 +9,13 @@ namespace UI {
         lv_obj_set_style_opa((lv_obj_t *) var, value, 0);
     }
 
-    lv_anim_t Animation::anim_fade_in(lv_obj_t *obj, uint32_t duration, uint32_t delay, lv_anim_ready_cb_t ready_cb,
+    lv_anim_t* Animation::anim_fade_in(lv_obj_t *obj, uint32_t duration, uint32_t delay, lv_anim_ready_cb_t ready_cb,
                                  void *user_data) {
         return anim_create(obj, anim_fade_cb, LV_OPA_TRANSP, LV_OPA_COVER,
                     duration, delay, 0, 0, 0, ready_cb, user_data);
     }
 
-    lv_anim_t Animation::anim_fade_out(lv_obj_t *obj, uint32_t duration, uint32_t delay, lv_anim_ready_cb_t ready_cb,
+    lv_anim_t* Animation::anim_fade_out(lv_obj_t *obj, uint32_t duration, uint32_t delay, lv_anim_ready_cb_t ready_cb,
                                   void *user_data) {
         return anim_create(obj, anim_fade_cb, LV_OPA_COVER, LV_OPA_TRANSP,
                     duration, delay, 0, 0, 0, ready_cb, user_data);
@@ -33,15 +33,14 @@ namespace UI {
         lv_obj_clear_flag((lv_obj_t *) anim->var, LV_OBJ_FLAG_HIDDEN);
     }
 
-    lv_anim_t
+    lv_anim_t*
     Animation::anim_create(lv_obj_t *obj, lv_anim_exec_xcb_t exec_cb, int value_start, int value_end, uint32_t duration,
                            uint32_t delay, uint32_t playback_time, uint32_t playback_delay, uint32_t repeat_cnt,
                            lv_anim_ready_cb_t read_cb, void *user_data, lv_anim_path_cb_t path) {
         lv_anim_t anim = anim_create_internal(obj, exec_cb, value_start, value_end, duration,
                                               delay, playback_time, playback_delay, repeat_cnt,
                                               read_cb, user_data, path);
-        lv_anim_start(&anim);
-        return anim;
+        return lv_anim_start(&anim);
     }
 
     void Animation::anim_fade_cb(void *param, int32_t value) {
