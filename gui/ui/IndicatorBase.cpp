@@ -53,10 +53,21 @@ namespace UI {
             if (m_animState == IndAnimLoadingOn) {
                 return;
             }
+
+            // If dot is currently visible, fade it out first
             if (m_animState == IndAnimDotOn) {
-                _setState(IndHidden);
+                m_anim = Animation::anim_fade_out(m_obj, LV_INDI_FADE_T, 0, [](lv_anim_t *anim) {
+                    auto instance = static_cast<IndicatorBase *>(anim->user_data);
+                    lv_obj_add_flag(instance->m_obj, LV_OBJ_FLAG_HIDDEN);
+                    instance->_setAnimState(IndAnimDotOff);
+                    // After dot fades out, start loading animation
+                    instance->_setState(instance->m_state);
+                }, this);
+                _setAnimState(IndAnimNotReady);
+                return;
             }
 
+            // Now we can show loading indicator
             lv_obj_clear_flag(m_loading, LV_OBJ_FLAG_HIDDEN);
             m_anim = Animation::anim_fade_in(m_loading, LV_INDI_FADE_T, 0, [](lv_anim_t *anim) {
                 auto instance = static_cast<IndicatorBase *>(anim->user_data);
@@ -64,11 +75,16 @@ namespace UI {
             }, this);
         } else {
             if (m_animState == IndAnimLoadingOn) {
+                // If loading is currently visible, fade it out first
                 m_anim = Animation::anim_fade_out(m_loading, LV_INDI_FADE_T, 0, [](lv_anim_t *anim) {
                     auto instance = static_cast<IndicatorBase *>(anim->user_data);
                     lv_obj_add_flag(instance->m_loading, LV_OBJ_FLAG_HIDDEN);
                     instance->_setAnimState(IndAnimLoadingOff);
+                    // After loading fades out, show the new state
+                    instance->_setState(instance->m_state);
                 }, this);
+                _setAnimState(IndAnimNotReady);
+                return;
             }
 
             if (state == IndHidden) {
@@ -99,7 +115,5 @@ namespace UI {
             }
         }
         _setAnimState(IndAnimNotReady);
-
-
     }
 }
