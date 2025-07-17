@@ -7,7 +7,7 @@
 
 #include <string>
 #include "UIBase.h"
-#include "Indicator.h"
+#include "Indicators.h"
 
 namespace UI {
     class UIDate : public Base {
@@ -26,7 +26,7 @@ namespace UI {
         std::string get_date_str(tm *time_info);
 
     private:
-        Indicator mIndicator;
+        Indicators mIndicator;
 
         lv_obj_t *calendar;
         lv_obj_t *mask;

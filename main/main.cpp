@@ -66,6 +66,7 @@ static lv_display_t * hal_init(int32_t w, int32_t h);
 #include "FontTTF.h"
 #include "Lottie.h"
 #include "RuntimeFont.h"
+#include "IndTest.h"
 #include "lv_font_runtime.h"
 #include "lv_font_writer.h"
 
@@ -83,8 +84,9 @@ std::shared_ptr<UI::Base> ui_init()
     //region UI make
     //ui = std::make_shared<UI::UITutorial>(nullptr);
     //ui = std::make_shared<UI::FontTTF>();
-    ui = std::make_shared<UI::Lottie>();
-    //ui = std::make_shared<UI::RuntimeFont>();
+//    ui = std::make_shared<UI::Lottie>();
+//    ui = std::make_shared<UI::RuntimeFont>();
+    ui = std::make_shared<UI::IndTest>();
     //endregion
 
     if (ui && ui->load())
@@ -197,6 +199,5 @@ static lv_display_t * hal_init(int32_t w, int32_t h)
     lv_indev_t * keyboard = lv_sdl_keyboard_create();
     lv_indev_set_display(keyboard, disp);
     lv_indev_set_group(keyboard, lv_group_get_default());
-
     return disp;
 }
