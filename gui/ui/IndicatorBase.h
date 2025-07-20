@@ -7,7 +7,8 @@
 
 #include "lvgl.h"
 
-#define LV_INDI_FADE_T      200
+#define LV_INDI_FADE_T          150
+#define LV_INDI_FLASH_T         250
 
 namespace UI {
     class IndicatorBase {
@@ -20,9 +21,8 @@ namespace UI {
         };
         enum IndAnimState {
             IndAnimNotReady,
-            IndAnimDotOff,
+            IndAnimOff,
             IndAnimDotOn,
-            IndAnimLoadingOff,
             IndAnimLoadingOn,
         };
     public:

@@ -35,7 +35,7 @@ namespace UI {
             lv_anim_set_repeat_count(m_anim, 0);
             lv_anim_set_ready_cb(m_anim, [](lv_anim_t *anim) {
                 auto instance = static_cast<IndicatorBase *>(lv_anim_get_user_data(anim));
-                instance->_setAnimState(IndAnimDotOff);
+                instance->_setAnimState(IndAnimOff);
                 instance->_setState(instance->m_state);
             });
         } else {
@@ -59,7 +59,7 @@ namespace UI {
                 m_anim = Animation::anim_fade_out(m_obj, LV_INDI_FADE_T, 0, [](lv_anim_t *anim) {
                     auto instance = static_cast<IndicatorBase *>(anim->user_data);
                     lv_obj_add_flag(instance->m_obj, LV_OBJ_FLAG_HIDDEN);
-                    instance->_setAnimState(IndAnimDotOff);
+                    instance->_setAnimState(IndAnimOff);
                     // After dot fades out, start loading animation
                     instance->_setState(instance->m_state);
                 }, this);
@@ -79,7 +79,7 @@ namespace UI {
                 m_anim = Animation::anim_fade_out(m_loading, LV_INDI_FADE_T, 0, [](lv_anim_t *anim) {
                     auto instance = static_cast<IndicatorBase *>(anim->user_data);
                     lv_obj_add_flag(instance->m_loading, LV_OBJ_FLAG_HIDDEN);
-                    instance->_setAnimState(IndAnimLoadingOff);
+                    instance->_setAnimState(IndAnimOff);
                     // After loading fades out, show the new state
                     instance->_setState(instance->m_state);
                 }, this);
@@ -88,13 +88,13 @@ namespace UI {
             }
 
             if (state == IndHidden) {
-                if (m_animState == IndAnimDotOff) {
+                if (m_animState == IndAnimOff) {
                     return;
                 }
                 m_anim = Animation::anim_fade_out(m_obj, LV_INDI_FADE_T, 0, [](lv_anim_t *anim) {
                     auto instance = static_cast<IndicatorBase *>(anim->user_data);
                     lv_obj_add_flag(instance->m_obj, LV_OBJ_FLAG_HIDDEN);
-                    instance->_setAnimState(IndAnimDotOff);
+                    instance->_setAnimState(IndAnimOff);
                 }, this);
             } else if (state == IndShow) {
                 if (m_animState == IndAnimDotOn) {
@@ -108,9 +108,9 @@ namespace UI {
             } else if (state == IndFlash) {
                 lv_obj_clear_flag(m_obj, LV_OBJ_FLAG_HIDDEN);
                 m_anim = Animation::anim_create(m_obj, Animation::anim_fade_cb,
-                                                LV_OPA_TRANSP, LV_OPA_COVER, LV_INDI_FADE_T, LV_INDI_FADE_T,
-                                                LV_INDI_FADE_T,
-                                                LV_INDI_FADE_T, -1,
+                                                LV_OPA_TRANSP, LV_OPA_COVER, LV_INDI_FLASH_T, LV_INDI_FLASH_T,
+                                                LV_INDI_FLASH_T,
+                                                LV_INDI_FLASH_T, -1,
                                                 nullptr, this);
             }
         }
