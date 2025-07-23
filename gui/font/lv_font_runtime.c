@@ -27,21 +27,21 @@ lv_font_t *lv_bin_runtime_create(const char* path)
 {
     LV_ASSERT_NULL(path);
 
-    static lv_fs_file_t file;
-    lv_fs_res_t fs_res = lv_fs_open(&file, path, LV_FS_MODE_RD);
+    lv_fs_file_t * file = (lv_fs_file_t *)lv_malloc_zeroed(sizeof(lv_fs_file_t));
+    lv_fs_res_t fs_res = lv_fs_open(file, path, LV_FS_MODE_RD);
     if(fs_res != LV_FS_RES_OK) return NULL;
 
     lv_font_t * font = lv_malloc_zeroed(sizeof(lv_font_t));
     LV_ASSERT_MALLOC(font);
 
-    if(!lvgl_load_font(&file, font)) {
+    if(!lvgl_load_font(file, font)) {
         LV_LOG_WARN("Error loading font file: %s", path);
         /*
         * When `lvgl_load_font` fails it can leak some pointers.
         * All non-null pointers can be assumed as allocated and
         * `lv_binfont_destroy` should free them correctly.
         */
-        lv_binfont_destroy(font);
+        lv_bin_runtime_destroy(font);
         font = NULL;
     }
 
@@ -83,8 +83,12 @@ void lv_bin_runtime_destroy(lv_font_t *font)
         }
     }
 
+    const glyph_info *info = font->user_data;
+    if (info->fp)
+        lv_free(info->fp);
+
     lv_free((void *)fdsc);
-    lv_free(font->user_data);
+    lv_free((void *)info);
     lv_free(font);
 }
 
@@ -622,17 +626,25 @@ const void *lv_font_runtime_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_dra
 
         uint32_t glyph_bitmap_length;
         uint8_t *bitmap_in = (uint8_t *)lv_malloc_zeroed(px_byte_size);
+        if (!bitmap_in)
+        {
+            LV_LOG_ERROR("No Memory");
+            return NULL;
+        }
 
         if (lv_fs_read(fp,&glyph_bitmap_length, sizeof(uint32_t),NULL) != LV_FS_RES_OK)
             return NULL;
+
+        uint32_t read_size = 0;
         if (lv_fs_seek(fp,gdsc.bitmap_index,LV_FS_SEEK_CUR) != LV_FS_RES_OK ||
-            lv_fs_read(fp,bitmap_in,px_byte_size,NULL) != LV_FS_RES_OK)
+            lv_fs_read(fp,bitmap_in,px_byte_size,&read_size) != LV_FS_RES_OK)
             return NULL;
 
         //uint8_t * bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
 
 
         uint8_t * bitmap_out_tmp = bitmap_out;
+        uint8_t *bitmap_in_temp = bitmap_in;
         int32_t i = 0;
         int32_t x, y;
         uint32_t stride_out = lv_draw_buf_width_to_stride(gdsc.box_w, LV_COLOR_FORMAT_A8);
@@ -641,23 +653,23 @@ const void *lv_font_runtime_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_dra
                 uint16_t line_rem = stride_in != 0 ? stride_in : gdsc.box_w;
                 for(x = 0; x < gdsc.box_w; x++, i++) {
                     i = i & 0x7;
-                    if(i == 0) bitmap_out_tmp[x] = (*bitmap_in) & 0x80 ? 0xff : 0x00;
-                    else if(i == 1) bitmap_out_tmp[x] = (*bitmap_in) & 0x40 ? 0xff : 0x00;
-                    else if(i == 2) bitmap_out_tmp[x] = (*bitmap_in) & 0x20 ? 0xff : 0x00;
-                    else if(i == 3) bitmap_out_tmp[x] = (*bitmap_in) & 0x10 ? 0xff : 0x00;
-                    else if(i == 4) bitmap_out_tmp[x] = (*bitmap_in) & 0x08 ? 0xff : 0x00;
-                    else if(i == 5) bitmap_out_tmp[x] = (*bitmap_in) & 0x04 ? 0xff : 0x00;
-                    else if(i == 6) bitmap_out_tmp[x] = (*bitmap_in) & 0x02 ? 0xff : 0x00;
+                    if(i == 0) bitmap_out_tmp[x] = (*bitmap_in_temp) & 0x80 ? 0xff : 0x00;
+                    else if(i == 1) bitmap_out_tmp[x] = (*bitmap_in_temp) & 0x40 ? 0xff : 0x00;
+                    else if(i == 2) bitmap_out_tmp[x] = (*bitmap_in_temp) & 0x20 ? 0xff : 0x00;
+                    else if(i == 3) bitmap_out_tmp[x] = (*bitmap_in_temp) & 0x10 ? 0xff : 0x00;
+                    else if(i == 4) bitmap_out_tmp[x] = (*bitmap_in_temp) & 0x08 ? 0xff : 0x00;
+                    else if(i == 5) bitmap_out_tmp[x] = (*bitmap_in_temp) & 0x04 ? 0xff : 0x00;
+                    else if(i == 6) bitmap_out_tmp[x] = (*bitmap_in_temp) & 0x02 ? 0xff : 0x00;
                     else if(i == 7) {
-                        bitmap_out_tmp[x] = (*bitmap_in) & 0x01 ? 0xff : 0x00;
+                        bitmap_out_tmp[x] = (*bitmap_in_temp) & 0x01 ? 0xff : 0x00;
                         line_rem--;
-                        bitmap_in++;
+                        bitmap_in_temp++;
                     }
                 }
                 /*Handle stride*/
                 if(stride_in) {
                     i = 0;  /*If there is a stride start from the next byte in the next line*/
-                    bitmap_in += line_rem;
+                    bitmap_in_temp += line_rem;
                 }
                 bitmap_out_tmp += stride_out;
             }
@@ -667,20 +679,20 @@ const void *lv_font_runtime_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_dra
                 uint16_t line_rem = stride_in != 0 ? stride_in : gdsc.box_w;
                 for(x = 0; x < gdsc.box_w; x++, i++) {
                     i = i & 0x3;
-                    if(i == 0) bitmap_out_tmp[x] = opa2_table[(*bitmap_in) >> 6];
-                    else if(i == 1) bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 4) & 0x3];
-                    else if(i == 2) bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 2) & 0x3];
+                    if(i == 0) bitmap_out_tmp[x] = opa2_table[(*bitmap_in_temp) >> 6];
+                    else if(i == 1) bitmap_out_tmp[x] = opa2_table[((*bitmap_in_temp) >> 4) & 0x3];
+                    else if(i == 2) bitmap_out_tmp[x] = opa2_table[((*bitmap_in_temp) >> 2) & 0x3];
                     else if(i == 3) {
-                        bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 0) & 0x3];
+                        bitmap_out_tmp[x] = opa2_table[((*bitmap_in_temp) >> 0) & 0x3];
                         line_rem--;
-                        bitmap_in++;
+                        bitmap_in_temp++;
                     }
                 }
 
                 /*Handle stride*/
                 if(stride_in) {
                     i = 0;  /*If there is a stride start from the next byte in the next line*/
-                    bitmap_in += line_rem;
+                    bitmap_in_temp += line_rem;
                 }
                 bitmap_out_tmp += stride_out;
             }
@@ -692,19 +704,19 @@ const void *lv_font_runtime_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_dra
                 for(x = 0; x < gdsc.box_w; x++, i++) {
                     i = i & 0x1;
                     if(i == 0) {
-                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in) >> 4];
+                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in_temp) >> 4];
                     }
                     else if(i == 1) {
-                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in) & 0xF];
+                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in_temp) & 0xF];
                         line_rem--;
-                        bitmap_in++;
+                        bitmap_in_temp++;
                     }
                 }
 
                 /*Handle stride*/
                 if(stride_in) {
                     i = 0;  /*If there is a stride start from the next byte in the next line*/
-                    bitmap_in += line_rem;
+                    bitmap_in_temp += line_rem;
                 }
                 bitmap_out_tmp += stride_out;
             }
@@ -713,16 +725,17 @@ const void *lv_font_runtime_get_glyph_bitmap(lv_font_glyph_dsc_t * g_dsc, lv_dra
             for(y = 0; y < gdsc.box_h; y ++) {
                 uint16_t line_rem = stride_in != 0 ? stride_in : gdsc.box_w;
                 for(x = 0; x < gdsc.box_w; x++, i++) {
-                    bitmap_out_tmp[x] = *bitmap_in;
+                    bitmap_out_tmp[x] = *bitmap_in_temp;
                     line_rem--;
-                    bitmap_in++;
+                    bitmap_in_temp++;
                 }
                 bitmap_out_tmp += stride_out;
-                bitmap_in += line_rem;
+                bitmap_in_temp += line_rem;
             }
         }
 
         lv_draw_buf_flush_cache(draw_buf, NULL);
+        lv_free(bitmap_in);
         return draw_buf;
     }
         /*Handle compressed bitmap*/

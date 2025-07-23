@@ -18,7 +18,8 @@ namespace UI
         bool _initialize() override;
 
     private:
-        lv_obj_t *label_runtime;
+        lv_obj_t *label_runtime1;
+        lv_obj_t *label_runtime2;
         lv_obj_t *label_font;
     };
 }
